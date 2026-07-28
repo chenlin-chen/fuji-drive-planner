@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
-<title>富士山 360° 逆時針自駕巡禮 | 導航修正版 V14</title>
+<title>富士山 360° 逆時針自駕巡禮 | 導航修正版 V15</title>
 <style>
   :root {
     --ink: #10141c;
@@ -177,6 +177,14 @@
           <option value="A4">A4 身延山久遠寺纜車 ＋ 南部茶</option>
         </select>
       </div>
+      <div class="field" id="fieldEishodo">
+        <label for="selEishodo">A1 附加站：身延 栄昇堂</label>
+        <select id="selEishodo">
+          <option value="skip" selected>不去（只排朝霧高原牧場）</option>
+          <option value="swap">去，改不去牧場（沿富士川南下・最順）</option>
+          <option value="both">兩站都去（需 70 分回頭路）</option>
+        </select>
+      </div>
       <div class="field">
         <label for="selMid">富士宮停留（炒麵＋參拜）</label>
         <select id="selMid">
@@ -233,13 +241,30 @@
         </div>
       </div>
       <div class="spot">
+        <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnWA9exzKbC9AZ7W6UVgKD41ImQXTdWNW5iDhC2HBhGuzXqTTbsPDA9jqzCiU9XlgzoA6HSlx63nKQGh1aKRhAL6XpExKwyNnBXndkl7OhXwpcTjoHrc2Q9o6mtiX-_ZKd6P4cmgg=s1360-w1360-h1020-rw" alt="栄昇堂">
+        <div class="body">
+          <div class="eyebrow">可選・沿 R300 西行</div>
+          <h4>身延 栄昇堂</h4>
+          <p>現做身延饅頭，坐在富士川畔長椅吃。從這裡沿 R52 南下接富士宮是一路順向，反而比繞朝霧高原省 20 分。</p>
+          <div class="ops">⚠ 8:30–15:00・週三定休</div>
+        </div>
+      </div>
+      <div class="spot">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShioMst8XJNf_T0IbEYy8APExpA6jK-vDoMenUPo0r0-gomhm4gSfyhuI&s=10" alt="まかいの牧場">
         <div class="body">
-          <div class="eyebrow">朝霧高原</div>
+          <div class="eyebrow">可選・沿 R139 南下</div>
           <h4>まかいの牧場（馬飼野牧場）</h4>
-          <p>富士山大鞦韆、餵羊、濃厚牛奶冰淇淋。沿 R139 一路南下，順向不回頭。</p>
+          <p>富士山大鞦韆、餵羊、濃厚牛奶冰淇淋。從本栖湖直接南下最順，但和栄昇堂在相反方向。</p>
           <div class="ops">⚠ 9:30 開園・需入園費</div>
         </div>
+      </div>
+    </div>
+    <div style="padding:0 18px 18px">
+      <div class="verdict v-warn" style="margin:0">
+        <h3>這兩站在地理上是互斥的</h3>
+        <p>栄昇堂在本栖湖<strong>西邊</strong>的富士川谷地，牧場在<strong>南邊</strong>的朝霧高原。<br>
+        只選一個 → 全程順向不回頭。兩個都要 → 得沿 R300 翻回本栖湖，多 70 分鐘回頭路，只有「06:30 出發 ＋ 富士宮 45 分 ＋ 後半段選 B0」這一種排法趕得上。<br>
+        上方選單改完會即時算給你看。</p>
       </div>
     </div>
   </article>
@@ -514,6 +539,10 @@
       <li>原版「首選組合 A3+B1」用它自己的產生器算是 15:05 抵達，會跳紅字警告。現在 A3／A4 這類長行程會直接顯示要縮短富士宮停留或提早出發，並算出還差幾分鐘。</li>
       <li>新增「B0 不加景點直奔山中湖」——A3／A4 配任何後半段都趕不上，這是它們唯一穩的走法。</li>
       <li>新增出發時間與富士宮停留兩個控制項，因為這兩個是唯一能真正把時間追回來的變數。</li>
+      <li><strong>A1 的身延栄昇堂改為可選</strong>，三種走法即時比較。栄昇堂在本栖湖西邊、牧場在南邊，
+          兩者地理上互斥：只去栄昇堂可沿富士川南下接富士宮，比繞朝霧高原還快 20 分；兩站都要就得多 70 分回頭路，
+          僅「06:30 出發 ＋ 富士宮 45 分 ＋ B0」這一種排法成立（14:40 抵達，餘裕 5 分）。</li>
+      <li>趕不上時，若換一種 A1 走法就能解決，判定框會直接指名建議哪一種。</li>
       <li>移除沒被使用的 <code>MIDPOINT.driveMinFromPrev</code>。</li>
     </ul>
 
@@ -527,7 +556,7 @@
     </ul>
   </section>
 
-  <footer>富士山 360° 逆時針自駕巡禮｜導航修正版 V14<br>
+  <footer>富士山 360° 逆時針自駕巡禮｜導航修正版 V15<br>
   車程為一般路況估值，含收費道路。出發前請以當日 Google Maps 實際路況與各設施官網為準。</footer>
 </main>
 
@@ -538,12 +567,50 @@
    行程設定檔
    drive = 從上一個點開車過來的分鐘數
    stay  = 建議停留分鐘數
-   open  = 最早可入場時間（分鐘，用來判斷是否太早到）
-   closed= 定休日提醒文字
+   open  = 最早可入場時間（分鐘），會自動算出空等時間
+   closed= 定休日提醒
+   navName / placeId = 給 Google Maps 導航用
    ============================================================ */
+
+const SPOT = {
+  nakanokura: { name: "中ノ倉峠 展望地", navName: "中ノ倉峠 展望地",
+    placeId: "ChIJ7a4flhbmG2ARI9Prrx2sjLE", stay: 85,
+    memo: "停車場在隧道旁，往展望台單程步行 20–30 分" },
+  makaino: { name: "まかいの牧場", navName: "まかいの牧場",
+    placeId: "ChIJyfHirW7bG2ARtXbzuYZRGpg", stay: 65,
+    open: 9 * 60 + 30, memo: "需入園費" },
+  eishodo: { name: "身延 栄昇堂", navName: "栄昇堂",
+    placeId: "ChIJMXNpv9vBG2ARrzNVJgVkRR8", stay: 25,
+    open: 8 * 60 + 30, closed: "週三定休（15:00 打烊）" },
+  shoji: { name: "精進湖展望台", navName: "精進湖展望台",
+    placeId: "ChIJHeOt4N7nG2ARerfeBmqpnx0", stay: 25, memo: "路邊停車僅約 2 格" },
+  koan: { name: "本栖湖 浩庵營地", navName: "浩庵キャンプ場",
+    placeId: "ChIJuea39RXmG2AR4z4fk_95fXc", stay: 25, memo: "非住宿者需付日歸入場費" },
+  tanuki: { name: "田貫湖", navName: "田貫湖",
+    placeId: "ChIJB4Fd897dG2ARQGU_RWxUWA4", stay: 30 },
+  shiraito: { name: "白絲瀑布 ＆ 音止瀑布", navName: "白糸の滝",
+    placeId: "ChIJTa6BAO7aG2ARo2W6w446Kgk", stay: 45,
+    memo: "停車場收費，往返兩瀑布有階梯" },
+  school: { name: "舊下部小中學校（停常光院）", navName: "常光院",
+    placeId: "ChIJN8w8sVXpG2ARwiLPUszt78Q", stay: 30,
+    memo: "校舍內部禁止進入，請保持安靜" },
+  selva: { name: "SELVA 身延店", navName: "セルバ身延店",
+    placeId: "ChIJzShsqYHrG2ARgXO5tTXLQNM", stay: 30, open: 8 * 60 + 30 },
+  utsubuna: { name: "內船駅 ＆ 南部橋", navName: "内船駅",
+    placeId: "ChIJbW1Zjb3GG2ARizHtdAccop4", stay: 25 },
+  ropeway: { name: "身延山纜車 久遠寺站", navName: "身延山ロープウェイ 久遠寺駅",
+    placeId: "ChIJU4A-9iLrG2ARjlR4x0Gm408", stay: 110,
+    open: 8 * 60 + 40, memo: "首班 8:40（冬季 9:00），20 分一班" },
+  nanbu: { name: "道之驛 なんぶ", navName: "道の駅なんぶ",
+    placeId: "ChIJPVgux2LBG2ARvYOSJctlzN4", stay: 30, open: 9 * 60 }
+};
+
+/* 建立停靠點：帶入這一段的車程分鐘數 */
+const at = (key, drive, override) => Object.assign({}, SPOT[key], { drive }, override || {});
+
 const CFG = {
-  TARGET_ARRIVAL: 14 * 60 + 45,   // 卡位目標 14:45
-  DIAMOND_TIME:   15 * 60 + 30,   // 鑽石富士 15:30
+  TARGET_ARRIVAL: 14 * 60 + 45,
+  DIAMOND_TIME:   15 * 60 + 30,
 
   ORIGIN: { name: "河口湖駅", navName: "河口湖駅", placeId: "ChIJMSQyt4JgGWARGxEj8inq2wc" },
 
@@ -555,77 +622,63 @@ const CFG = {
     memo: "淺間大社 8:30 開門，お宮橫丁（炒麵）10:00 才開"
   },
 
-  DEST: {
-    name: "山中湖 平野之濱",
-    navName: "山中湖 平野の浜",
-    placeId: "ChIJNxzQjuxvGWARSiMK1UFfoa4"
+  DEST: { name: "山中湖 平野之濱", navName: "山中湖 平野の浜",
+          placeId: "ChIJNxzQjuxvGWARSiMK1UFfoa4" },
+
+  /* A1 的三種走法：栄昇堂在西、牧場在南，地理上互斥 */
+  A1_VARIANTS: {
+    skip: { label: "只去牧場", toMid: 35,
+      spots: [at("nakanokura", 35), at("makaino", 40)] },
+    swap: { label: "只去栄昇堂", toMid: 55,
+      midMemo: "沿 R52 順富士川南下，接中部橫斷道／新東名（需過路費）",
+      spots: [at("nakanokura", 35), at("eishodo", 40)] },
+    both: { label: "兩站都去", toMid: 35,
+      spots: [at("nakanokura", 35), at("eishodo", 40),
+              at("makaino", 70, { memo: "需沿 R300 翻回本栖湖再南下，這段是回頭路" })] }
   },
 
   A: {
-    A1: { toMid: 35, spots: [
-      { name: "中ノ倉峠 展望地", navName: "中ノ倉峠 展望地", placeId: "ChIJ7a4flhbmG2ARI9Prrx2sjLE", drive: 35, stay: 85,
-        memo: "停車場在隧道旁，往展望台單程步行 20–30 分" },
-      { name: "まかいの牧場", navName: "まかいの牧場", placeId: "ChIJyfHirW7bG2ARtXbzuYZRGpg", drive: 40, stay: 65,
-        open: 9 * 60 + 30, memo: "需入園費" }
-    ]},
-    A2: { toMid: 22, spots: [
-      { name: "精進湖展望台", navName: "精進湖展望台", placeId: "ChIJHeOt4N7nG2ARerfeBmqpnx0", drive: 22, stay: 25,
-        memo: "路邊停車僅約 2 格" },
-      { name: "本栖湖 浩庵營地", navName: "浩庵キャンプ場", placeId: "ChIJuea39RXmG2AR4z4fk_95fXc", drive: 10, stay: 25,
-        memo: "非住宿者需付日歸入場費" },
-      { name: "田貫湖", navName: "田貫湖", placeId: "ChIJB4Fd897dG2ARQGU_RWxUWA4", drive: 35, stay: 30 },
-      { name: "白絲瀑布 ＆ 音止瀑布", navName: "白糸の滝", placeId: "ChIJTa6BAO7aG2ARo2W6w446Kgk", drive: 12, stay: 45,
-        memo: "停車場收費，往返兩瀑布有階梯" }
-    ]},
-    A3: { toMid: 45, midMemo: "走中部橫斷道（需過路費）", spots: [
-      { name: "本栖湖 浩庵營地", navName: "浩庵キャンプ場", placeId: "ChIJuea39RXmG2AR4z4fk_95fXc", drive: 35, stay: 40,
-        memo: "需付日歸入場費" },
-      { name: "舊下部小中學校（停常光院）", navName: "常光院", placeId: "ChIJN8w8sVXpG2ARwiLPUszt78Q", drive: 25, stay: 30,
-        memo: "校舍內部禁止進入，請保持安靜" },
-      { name: "SELVA 身延店", navName: "セルバ身延店", placeId: "ChIJzShsqYHrG2ARgXO5tTXLQNM", drive: 15, stay: 30,
-        open: 8 * 60 + 30 },
-      { name: "身延站前 栄昇堂", navName: "栄昇堂", placeId: "ChIJMXNpv9vBG2ARrzNVJgVkRR8", drive: 18, stay: 30,
-        open: 8 * 60 + 30, closed: "週三定休（15:00 打烊）" },
-      { name: "內船駅 ＆ 南部橋", navName: "内船駅", placeId: "ChIJbW1Zjb3GG2ARizHtdAccop4", drive: 18, stay: 25 }
-    ]},
-    A4: { toMid: 45, midMemo: "走中部橫斷道（需過路費）", spots: [
-      { name: "身延山纜車 久遠寺站", navName: "身延山ロープウェイ 久遠寺駅", placeId: "ChIJU4A-9iLrG2ARjlR4x0Gm408", drive: 70, stay: 110,
-        open: 8 * 60 + 40, memo: "首班 8:40（冬季 9:00），20 分一班" },
-      { name: "身延 栄昇堂", navName: "栄昇堂", placeId: "ChIJMXNpv9vBG2ARrzNVJgVkRR8", drive: 15, stay: 25,
-        open: 8 * 60 + 30, closed: "週三定休" },
-      { name: "道之驛 なんぶ", navName: "道の駅なんぶ", placeId: "ChIJPVgux2LBG2ARvYOSJctlzN4", drive: 15, stay: 30,
-        open: 9 * 60 }
-    ]}
+    A2: { toMid: 22, spots: [at("shoji", 22), at("koan", 10), at("tanuki", 35), at("shiraito", 12)] },
+    A3: { toMid: 45, midMemo: "走中部橫斷道（需過路費）",
+      spots: [at("koan", 35, { stay: 40, memo: "需付日歸入場費" }), at("school", 25),
+              at("selva", 15), at("eishodo", 18, { stay: 30, name: "身延站前 栄昇堂" }),
+              at("utsubuna", 18)] },
+    A4: { toMid: 45, midMemo: "走中部橫斷道（需過路費）",
+      spots: [at("ropeway", 70), at("eishodo", 15), at("nanbu", 15)] }
   },
 
   B: {
     B0: { toDest: 90, destMemo: "走東名經御殿場，過篭坂峠進山中湖", spots: [] },
-    B1: { toDest: 85, spots: [
-      { name: "富士山夢之大橋", navName: "富士山夢の大橋", placeId: "ChIJfZPnEQArGmARLopF0Yas1CM", drive: 25, stay: 30,
-        memo: "住宅區內，現場有排隊管制" } ]},
-    B2: { toDest: 80, spots: [
-      { name: "大淵笹場", navName: "大淵笹場", placeId: "ChIJadkMX6LVG2ARQxgJU6Dq-6U", drive: 25, stay: 35,
-        memo: "上山道路狹窄，停車場不大" } ]},
-    B3: { toDest: 55, spots: [
-      { name: "水ヶ塚公園", navName: "水ヶ塚公園", placeId: "ChIJVdYcwUV8GWARouaFhTMTojU", drive: 40, stay: 30,
-        memo: "園內設施平日休；冬季須查富士山 Skyline 通行止" } ]},
-    B4: { toDest: 35, spots: [
-      { name: "とらや工房", navName: "とらや工房", placeId: "ChIJObYJEAh2GWARg3zTQLKBIrA", drive: 55, stay: 30,
-        open: 10 * 60, closed: "週二定休" } ]},
-    B5: { toDest: 35, spots: [
-      { name: "御殿場 平和公園", navName: "平和公園 御殿場", placeId: "ChIJTY8hYQN2GWAROiaPE1eMwak", drive: 55, stay: 30,
-        open: 9 * 60 } ]},
-    B6: { toDest: 90, spots: [
-      { name: "富士山世界遺產中心", navName: "静岡県富士山世界遺産センター", placeId: "ChIJg3cRUwHRG2AR2PSLlojYNl8", drive: 5, stay: 40,
-        open: 9 * 60, memo: "無專屬停車場，須停周邊收費場" } ]}
+    B1: { toDest: 85, spots: [{ name: "富士山夢之大橋", navName: "富士山夢の大橋",
+      placeId: "ChIJfZPnEQArGmARLopF0Yas1CM", drive: 25, stay: 30,
+      memo: "住宅區內，現場有排隊管制" }] },
+    B2: { toDest: 80, spots: [{ name: "大淵笹場", navName: "大淵笹場",
+      placeId: "ChIJadkMX6LVG2ARQxgJU6Dq-6U", drive: 25, stay: 35,
+      memo: "上山道路狹窄，停車場不大" }] },
+    B3: { toDest: 55, spots: [{ name: "水ヶ塚公園", navName: "水ヶ塚公園",
+      placeId: "ChIJVdYcwUV8GWARouaFhTMTojU", drive: 40, stay: 30,
+      memo: "園內設施平日休；冬季須查富士山 Skyline 通行止" }] },
+    B4: { toDest: 35, spots: [{ name: "とらや工房", navName: "とらや工房",
+      placeId: "ChIJObYJEAh2GWARg3zTQLKBIrA", drive: 55, stay: 30,
+      open: 10 * 60, closed: "週二定休" }] },
+    B5: { toDest: 35, spots: [{ name: "御殿場 平和公園", navName: "平和公園 御殿場",
+      placeId: "ChIJTY8hYQN2GWAROiaPE1eMwak", drive: 55, stay: 30, open: 9 * 60 }] },
+    B6: { toDest: 90, spots: [{ name: "富士山世界遺產中心", navName: "静岡県富士山世界遺産センター",
+      placeId: "ChIJg3cRUwHRG2AR2PSLlojYNl8", drive: 5, stay: 40,
+      open: 9 * 60, memo: "無專屬停車場，須停周邊收費場" }] }
   }
 };
 
 const hhmm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 
-/* 走一次行程，回傳每一列與最終抵達時間 */
-function runPlan(startMin, aKey, midStay, bKey) {
-  const A = CFG.A[aKey], B = CFG.B[bKey];
+/* 依選單解出前半段實際內容 */
+function resolveA(aKey, variant) {
+  return aKey === "A1" ? CFG.A1_VARIANTS[variant] : CFG.A[aKey];
+}
+
+/* 走一次行程 */
+function runPlan(startMin, aPlan, midStay, bKey) {
+  const B = CFG.B[bKey];
   const rows = [];
   let t = startMin;
 
@@ -633,80 +686,72 @@ function runPlan(startMin, aKey, midStay, bKey) {
               detail: "完成河口湖日出賞景，啟程" });
 
   const walk = (spot) => {
-    let arrive = t + spot.drive;
-    let flag = "";
-    if (spot.open && arrive < spot.open) {
-      flag = "抵達時尚未開門（" + hhmm(spot.open) + " 開），會空等 " + (spot.open - arrive) + " 分";
-    }
-    const depart = Math.max(arrive, spot.open || 0) + spot.stay;
+    const arrive = t + spot.drive;
+    const start = Math.max(arrive, spot.open || 0);
+    const flag = (spot.open && arrive < spot.open)
+      ? "抵達時尚未開門（" + hhmm(spot.open) + " 開），會空等 " + (spot.open - arrive) + " 分"
+      : "";
     rows.push({
-      time: hhmm(arrive) + " – " + hhmm(depart),
+      time: hhmm(arrive) + " – " + hhmm(start + spot.stay),
       name: spot.name, kind: "spot", drive: spot.drive, stay: spot.stay,
       memo: [spot.memo, spot.closed].filter(Boolean).join("・"), flag
     });
-    t = depart;
+    t = start + spot.stay;
   };
 
-  A.spots.forEach(walk);
+  aPlan.spots.forEach(walk);
 
-  // 中途站：富士宮
-  const midArrive = t + A.toMid;
-  let midFlag = "";
-  if (midArrive < CFG.MID.open) {
-    midFlag = "お宮橫丁 10:00 才開，會空等 " + (CFG.MID.open - midArrive) + " 分";
-  }
-  const midDepart = midArrive + midStay;
+  const midArrive = t + aPlan.toMid;
+  const midStart = Math.max(midArrive, CFG.MID.open);
   rows.push({
-    time: hhmm(midArrive) + " – " + hhmm(midDepart),
+    time: hhmm(midArrive) + " – " + hhmm(midStart + midStay),
     name: "中途站：" + CFG.MID.name, kind: "mid",
-    drive: A.toMid, stay: midStay,
-    memo: [CFG.MID.memo, A.midMemo].filter(Boolean).join("・"), flag: midFlag
+    drive: aPlan.toMid, stay: midStay,
+    memo: [CFG.MID.memo, aPlan.midMemo].filter(Boolean).join("・"),
+    flag: midArrive < CFG.MID.open
+      ? "お宮橫丁 10:00 才開，會空等 " + (CFG.MID.open - midArrive) + " 分" : ""
   });
-  t = midDepart;
+  t = midStart + midStay;
 
   B.spots.forEach(walk);
 
   const finalArrive = t + B.toDest;
   rows.push({
     time: hhmm(finalArrive) + " 抵達",
-    name: "終點：" + CFG.DEST.name, kind: "end",
-    drive: B.toDest,
-    memo: (B.destMemo ? B.destMemo + "・" : "") +
-          "卡位等待 " + hhmm(CFG.DIAMOND_TIME) + " 鑽石富士"
+    name: "終點：" + CFG.DEST.name, kind: "end", drive: B.toDest,
+    memo: (B.destMemo ? B.destMemo + "・" : "")
+        + "卡位等待 " + hhmm(CFG.DIAMOND_TIME) + " 鑽石富士"
   });
 
   return { rows, finalArrive };
 }
 
-/* 找出在其他條件不變下，還能撐住的最長富士宮停留 */
-function maxMidStay(startMin, aKey, bKey) {
+const arriveAt = (s, a, m, b) => runPlan(s, a, m, b).finalArrive;
+
+/* 在其他條件不變下還撐得住的最長富士宮停留（下限 45） */
+function maxMidStay(startMin, aPlan, bKey) {
   for (let s = 90; s >= 45; s -= 15) {
-    if (runPlan(startMin, aKey, s, bKey).finalArrive <= CFG.TARGET_ARRIVAL) return s;
+    if (arriveAt(startMin, aPlan, s, bKey) <= CFG.TARGET_ARRIVAL) return s;
   }
   return -1;
 }
 
-/* 若砍掉前半段最後一站就能達標，回傳那一站的名字 */
-function dropLastSpot(startMin, aKey, midStay, bKey) {
-  const spots = CFG.A[aKey].spots;
-  if (spots.length < 2) return null;
-  const last = spots[spots.length - 1];
-  const trimmed = { ...CFG.A[aKey], spots: spots.slice(0, -1) };
-  const saved = CFG.A[aKey];
-  CFG.A[aKey] = trimmed;
-  const arrive = runPlan(startMin, aKey, midStay, bKey).finalArrive;
-  CFG.A[aKey] = saved;
-  return (CFG.TARGET_ARRIVAL - arrive >= 15) ? last.name : null;
+/* 砍掉前半段最後一站是否就達標 */
+function dropLastSpot(startMin, aPlan, midStay, bKey) {
+  if (aPlan.spots.length < 2) return null;
+  const trimmed = Object.assign({}, aPlan, { spots: aPlan.spots.slice(0, -1) });
+  return arriveAt(startMin, trimmed, midStay, bKey) <= CFG.TARGET_ARRIVAL - 15
+    ? aPlan.spots[aPlan.spots.length - 1].name : null;
 }
 
-function buildMapsUrl(aKey, bKey) {
-  const pts = [...CFG.A[aKey].spots, CFG.MID, ...CFG.B[bKey].spots];
-  const q = s => encodeURIComponent(s);
-  const label = p => p.navName || p.name;
+function buildMapsUrl(aPlan, bKey) {
+  const pts = [...aPlan.spots, CFG.MID, ...CFG.B[bKey].spots];
+  const q = encodeURIComponent;
+  const label = p => q(p.navName || p.name);
   return "https://www.google.com/maps/dir/?api=1"
-    + "&origin=" + q(label(CFG.ORIGIN)) + "&origin_place_id=" + q(CFG.ORIGIN.placeId)
-    + "&destination=" + q(label(CFG.DEST)) + "&destination_place_id=" + q(CFG.DEST.placeId)
-    + "&waypoints=" + pts.map(p => q(label(p))).join("|")
+    + "&origin=" + label(CFG.ORIGIN) + "&origin_place_id=" + q(CFG.ORIGIN.placeId)
+    + "&destination=" + label(CFG.DEST) + "&destination_place_id=" + q(CFG.DEST.placeId)
+    + "&waypoints=" + pts.map(label).join("|")
     + "&waypoint_place_ids=" + pts.map(p => q(p.placeId)).join("|")
     + "&travelmode=driving";
 }
@@ -714,81 +759,86 @@ function buildMapsUrl(aKey, bKey) {
 function render() {
   const startMin = +document.getElementById("selStart").value;
   const aKey = document.getElementById("selA").value;
+  const variant = document.getElementById("selEishodo").value;
   const bKey = document.getElementById("selB").value;
   const midStay = +document.getElementById("selMid").value;
 
-  const { rows, finalArrive } = runPlan(startMin, aKey, midStay, bKey);
+  // 栄昇堂選項只在 A1 有作用
+  const isA1 = aKey === "A1";
+  document.getElementById("selEishodo").disabled = !isA1;
+  document.getElementById("fieldEishodo").style.opacity = isA1 ? "1" : ".45";
+
+  const aPlan = resolveA(aKey, variant);
+  const { rows, finalArrive } = runPlan(startMin, aPlan, midStay, bKey);
   const slack = CFG.TARGET_ARRIVAL - finalArrive;
 
-  // 高亮選中的卡片
   document.querySelectorAll(".plan").forEach(p => p.classList.remove("on"));
   [aKey, bKey].forEach(k => {
     const el = document.getElementById("card-" + k);
     if (el) el.classList.add("on");
   });
 
-  // 判定
   const v = document.getElementById("verdict");
+  const tail = isA1 ? "（A1・" + aPlan.label + "）" : "";
   let cls, head, body = "", fix = "";
 
   if (slack >= 15) {
     cls = "v-go";
-    head = "趕得上：預計 " + hhmm(finalArrive) + " 抵達平野之濱，比卡位目標早 " + slack + " 分鐘";
+    head = "趕得上：預計 " + hhmm(finalArrive) + " 抵達平野之濱，比卡位目標早 " + slack + " 分鐘" + tail;
     body = "有餘裕停車、找位置、架腳架。";
   } else if (slack >= 0) {
     cls = "v-warn";
-    head = "壓線：預計 " + hhmm(finalArrive) + " 抵達，只剩 " + slack + " 分鐘餘裕";
+    head = "壓線：預計 " + hhmm(finalArrive) + " 抵達，只剩 " + slack + " 分鐘餘裕" + tail;
     body = "旺季週末的篭坂峠與湖畔停車位很容易塞掉這點餘裕，建議提早出發或砍掉一站。";
   } else {
     cls = "v-stop";
-    head = "趕不上：預計 " + hhmm(finalArrive) + " 抵達，比卡位目標晚 " + (-slack) + " 分鐘";
-    body = "仍在鑽石富士（" + hhmm(CFG.DIAMOND_TIME) + "）之前 "
-         + (CFG.DIAMOND_TIME - finalArrive) + " 分鐘抵達，但沒有卡位緩衝。";
-    if (finalArrive >= CFG.DIAMOND_TIME) {
-      body = "會錯過 " + hhmm(CFG.DIAMOND_TIME) + " 的鑽石富士，這個組合不可行。";
-    }
+    head = "趕不上：預計 " + hhmm(finalArrive) + " 抵達，比卡位目標晚 " + (-slack) + " 分鐘" + tail;
+    body = finalArrive >= CFG.DIAMOND_TIME
+      ? "會錯過 " + hhmm(CFG.DIAMOND_TIME) + " 的鑽石富士，這個組合不可行。"
+      : "仍在鑽石富士（" + hhmm(CFG.DIAMOND_TIME) + "）之前 "
+        + (CFG.DIAMOND_TIME - finalArrive) + " 分鐘抵達，但沒有卡位緩衝。";
   }
 
-  // 補救建議
   if (slack < 15) {
-    const best = maxMidStay(startMin, aKey, bKey);
-    const options = [];
-    if (best >= 0 && best < midStay) {
-      options.push("富士宮停留縮到 " + best + " 分");
+    const o = [];
+    const best = maxMidStay(startMin, aPlan, bKey);
+    if (best >= 45 && best < midStay) o.push("富士宮停留縮到 " + best + " 分");
+    if (startMin > 390 && CFG.TARGET_ARRIVAL - arriveAt(390, aPlan, midStay, bKey) >= 15)
+      o.push("出發時間提早到 06:30");
+    if (bKey !== "B0" && CFG.TARGET_ARRIVAL - arriveAt(startMin, aPlan, midStay, "B0") >= 15)
+      o.push("後半段改成 B0 直奔山中湖");
+    // A1 專屬：換一種栄昇堂走法就能解決嗎
+    if (isA1) {
+      Object.keys(CFG.A1_VARIANTS).filter(k => k !== variant).forEach(k => {
+        const alt = CFG.A1_VARIANTS[k];
+        if (CFG.TARGET_ARRIVAL - arriveAt(startMin, alt, midStay, bKey) >= 15)
+          o.push("A1 改成「" + alt.label + "」");
+      });
     }
-    if (startMin > 390) {
-      const earlier = runPlan(390, aKey, midStay, bKey).finalArrive;
-      if (CFG.TARGET_ARRIVAL - earlier >= 15) options.push("出發時間提早到 06:30");
+    if (!isA1) {
+      const d = dropLastSpot(startMin, aPlan, midStay, bKey);
+      if (d) o.push("前半段砍掉最後一站「" + d + "」");
     }
-    if (bKey !== "B0") {
-      const direct = runPlan(startMin, aKey, midStay, "B0").finalArrive;
-      if (CFG.TARGET_ARRIVAL - direct >= 15) options.push("後半段改成 B0 直奔山中湖");
-    }
-    const drop = dropLastSpot(startMin, aKey, midStay, bKey);
-    if (drop) options.push("前半段砍掉最後一站「" + drop + "」");
-    fix = options.length
-      ? "怎麼補回來：" + options.join("，或 ")
-      : "這個前半段的長度本身就吃掉了全部時間，建議換成 A1 或 A2。";
+    fix = o.length ? "怎麼補回來：" + o.join("，或 ")
+                   : "這個前半段的長度本身就吃掉了全部時間，建議改用 A1 或 A2。";
   }
 
   v.className = "verdict " + cls;
   v.innerHTML = "<h3>" + head + "</h3><p>" + body + "</p>"
               + (fix ? '<p class="fix">' + fix + "</p>" : "");
 
-  // 導航連結
-  document.getElementById("mapsLink").href = buildMapsUrl(aKey, bKey);
-  const stops = CFG.A[aKey].spots.length + 1 + CFG.B[bKey].spots.length + 2;
+  document.getElementById("mapsLink").href = buildMapsUrl(aPlan, bKey);
+  const stops = aPlan.spots.length + 1 + CFG.B[bKey].spots.length + 2;
   document.getElementById("mapsNote").textContent =
     "共 " + stops + " 個停靠點，以 Place ID 鎖定，不會被同名地點導錯。"
     + (stops > 9 ? "（已接近 Google Maps 單一路線 10 站上限）" : "");
 
-  // 時間表
   const clsMap = { start: "r-start", mid: "r-mid", end: "r-end" };
   document.getElementById("tbody").innerHTML = rows.map(r => {
     const bits = [];
     if (r.drive) bits.push('<span class="pill p-drive">開車 ' + r.drive + " 分</span>");
     if (r.stay)  bits.push('<span class="pill p-stay">停留 ' + r.stay + " 分</span>");
-    let cell = bits.join(" ") + (r.detail ? r.detail : "");
+    let cell = bits.join(" ") + (r.detail || "");
     if (r.memo) cell += '<span class="memo">' + r.memo + "</span>";
     if (r.flag) cell += '<span class="flag">⚠ ' + r.flag + "</span>";
     return '<tr class="' + (clsMap[r.kind] || "") + '"><td class="time">' + r.time
@@ -799,7 +849,7 @@ function render() {
 }
 
 document.getElementById("calcBtn").addEventListener("click", render);
-["selStart", "selA", "selMid", "selB"].forEach(id =>
+["selStart", "selA", "selEishodo", "selMid", "selB"].forEach(id =>
   document.getElementById(id).addEventListener("change", render));
 render();
 </script>
