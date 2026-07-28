@@ -1,936 +1,807 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 解除外部圖片 Hotlink / Referer 阻擋 -->
-    <meta name="referrer" content="no-referrer">
-    <title>富士山 360° 順時針尊榮自駕巡禮 | 路線導航整合版</title>
-    
-    <style>
-        :root {
-            --primary: #0f172a;
-            --primary-blue: #1e3a8a;
-            --accent-gold: #d97706;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-            --border-color: #e2e8f0;
-            --success-green: #15803d;
-            --active-glow: #3b82f6;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>富士山 360° 逆時針自駕巡禮 | 導航修正版 V14</title>
+<style>
+  :root {
+    --ink: #10141c;
+    --ink-soft: #4a5568;
+    --paper: #f6f7f9;
+    --card: #ffffff;
+    --line: #e3e7ed;
+    --indigo: #1e3a8a;
+    --indigo-soft: #eef2ff;
+    --gold: #b45309;
+    --gold-soft: #fef6e7;
+    --go: #15803d;
+    --go-soft: #e8f6ec;
+    --warn: #a16207;
+    --warn-soft: #fdf6e3;
+    --stop: #b91c1c;
+    --stop-soft: #fdecec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.65; padding-bottom: 60px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; padding-bottom: 80px; }
+  /* ---------- hero ---------- */
+  .hero {
+    background: linear-gradient(rgba(16,20,28,.78), rgba(30,58,138,.86)),
+      url('https://img.cooljapan-videos.com/files/articles/1aqdxsrg/thumbnail/e93428a87222e3723b5c8d420acc0069c68f43c1.jpg.webp') center/cover no-repeat;
+    color: #fff; padding: 64px 20px 44px; text-align: center;
+  }
+  .hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.5rem); font-weight: 800; letter-spacing: -.02em; }
+  .hero .sub { margin: 14px auto 20px; max-width: 780px; color: #dbe3f0; font-size: 1.02rem; }
+  .chips { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .chip { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28);
+          padding: 5px 14px; border-radius: 30px; font-size: .86rem; }
+  .chip.hot { background: var(--gold); border-color: transparent; font-weight: 700; }
 
-        .hero {
-            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(30, 58, 138, 0.85)), 
-                        url('https://img.cooljapan-videos.com/files/articles/1aqdxsrg/thumbnail/e93428a87222e3723b5c8d420acc0069c68f43c1.jpg.webp') center/cover no-repeat;
-            color: white; padding: 70px 20px 50px; text-align: center;
-        }
-        .hero h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 16px; }
-        .hero p { font-size: 1.15rem; color: #e2e8f0; max-width: 850px; margin: 0 auto 24px; }
-        .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .badge { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 6px 16px; border-radius: 30px; font-size: 0.9rem; color: #f8fafc; }
-        .badge-gold { background: var(--accent-gold); border: none; color: white; font-weight: bold; }
+  /* ---------- planner ---------- */
+  .planner {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 24px; margin: -28px 0 36px; position: relative; z-index: 5;
+    box-shadow: 0 14px 34px rgba(16,20,28,.08);
+  }
+  .planner h2 { font-size: 1.25rem; color: var(--indigo); margin-bottom: 6px; }
+  .planner .hint { color: var(--ink-soft); font-size: .9rem; margin-bottom: 18px; }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: .84rem; font-weight: 700; color: var(--ink); }
+  .field select {
+    padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px;
+    background: #fbfcfd; font-size: .93rem; font-weight: 600; color: var(--ink);
+    font-family: inherit; cursor: pointer;
+  }
+  .field select:focus { outline: 2px solid var(--indigo); outline-offset: 1px; }
+  .go-btn {
+    margin-top: 16px; width: 100%; padding: 14px; border: 0; border-radius: 10px;
+    background: var(--indigo); color: #fff; font-size: 1rem; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+  }
+  .go-btn:hover { background: #17307a; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  /* ---------- verdict ---------- */
+  .result { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 22px; }
+  .verdict { border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; border: 1px solid; }
+  .verdict h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .verdict p { font-size: .92rem; margin-top: 4px; }
+  .v-go   { background: var(--go-soft);   border-color: #bfe3c9; color: #14532d; }
+  .v-warn { background: var(--warn-soft); border-color: #ecdca8; color: #713f12; }
+  .v-stop { background: var(--stop-soft); border-color: #f2c2c2; color: #7f1d1d; }
+  .fix { margin-top: 8px; font-size: .9rem; font-weight: 700; }
 
-        .timeline-bar {
-            background: white; border-radius: 12px; border: 1px solid var(--border-color);
-            padding: 20px; margin: -30px auto 30px; position: relative; z-index: 10;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 15px;
-        }
-        .timeline-step { flex: 1; min-width: 160px; text-align: center; }
-        .timeline-time { font-size: 1.05rem; font-weight: 800; color: var(--primary-blue); }
-        .timeline-desc { font-size: 0.88rem; color: var(--text-muted); }
+  .maps-btn {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--go); color: #fff;
+    padding: 12px 20px; border-radius: 9px; text-decoration: none; font-weight: 700; font-size: .95rem;
+  }
+  .maps-btn:hover { background: #166534; }
+  .maps-note { font-size: .82rem; color: var(--ink-soft); margin-top: 8px; }
 
-        .route-generator-card {
-            background: #ffffff;
-            border: 2px solid var(--primary-blue);
-            border-radius: 16px;
-            padding: 24px;
-            margin: 0 0 40px 0;
-            box-shadow: 0 12px 28px rgba(30, 58, 138, 0.12);
-            transition: all 0.3s ease;
-        }
-        .route-generator-card h3 {
-            color: var(--primary-blue);
-            margin-bottom: 8px;
-            font-size: 1.35rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .generator-subtitle {
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            margin-bottom: 20px;
-        }
-        .select-group {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            margin-bottom: 20px;
-        }
-        .select-box {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex: 1;
-            min-width: 240px;
-        }
-        .select-box label {
-            font-weight: 700;
-            font-size: 0.92rem;
-            color: var(--text-dark);
-        }
-        .select-box select {
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            font-size: 0.95rem;
-            background-color: #f8fafc;
-            color: var(--text-dark);
-            font-weight: 600;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .select-box select:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            background-color: #ffffff;
-        }
-        .btn-calc {
-            background: linear-gradient(135deg, var(--primary-blue), #1e293b);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.2s;
-            height: 46px;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-calc:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.35);
-        }
-        .btn-calc:active {
-            transform: translateY(0);
-        }
+  /* ---------- table ---------- */
+  .t-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; margin-top: 18px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: .9rem; vertical-align: top; }
+  th { background: #f1f4f8; color: var(--indigo); font-weight: 700; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.time { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .r-start { background: #fafbfc; }
+  .r-mid   { background: var(--indigo-soft); }
+  .r-end   { background: var(--gold-soft); font-weight: 700; }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: .76rem; font-weight: 700; margin-right: 5px; }
+  .p-drive { background: #e5f0fb; color: #1e40af; }
+  .p-stay  { background: var(--gold-soft); color: var(--gold); }
+  .flag { display: block; margin-top: 5px; font-size: .82rem; color: var(--stop); font-weight: 700; }
+  .memo { display: block; margin-top: 5px; font-size: .82rem; color: var(--ink-soft); }
 
-        .route-result {
-            margin-top: 24px;
-            border-top: 2px dashed var(--border-color);
-            padding-top: 20px;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .result-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        .btn-gmaps {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--success-green);
-            color: white;
-            padding: 12px 22px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: background 0.2s, transform 0.15s;
-            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
-        }
-        .btn-gmaps:hover { background: #166534; transform: translateY(-2px); }
-        .badge-status {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+  /* ---------- sections ---------- */
+  .sec-head { margin: 44px 0 18px; display: flex; align-items: center; gap: 12px;
+              border-bottom: 2px solid #cfd7e2; padding-bottom: 10px; }
+  .sec-head span { background: var(--indigo); color: #fff; width: 32px; height: 32px; border-radius: 50%;
+                   display: grid; place-items: center; font-weight: 700; font-size: .95rem; flex: none; }
+  .sec-head h2 { font-size: 1.3rem; color: var(--indigo); }
 
-        .schedule-table-wrapper {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .schedule-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        .schedule-table th, .schedule-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.92rem;
-        }
-        .schedule-table th { background: #f1f5f9; color: var(--primary-blue); font-weight: 700; }
-        .schedule-table tr:last-child td { border-bottom: none; }
-        .schedule-table tr:hover { background: #f8fafc; }
-        .tag-drive { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 700; margin-right: 6px; }
-        .tag-stay { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 700; margin-right: 6px; }
+  .plan { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+          margin-bottom: 22px; overflow: hidden; }
+  .plan.on { border: 2px solid var(--indigo); box-shadow: 0 0 0 4px rgba(30,58,138,.09); }
+  .plan-top { background: #f1f4f8; padding: 14px 20px; border-bottom: 1px solid var(--line);
+              display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .plan-top h3 { font-size: 1.08rem; color: var(--indigo); }
+  .road { background: #e5f0fb; color: #1e40af; padding: 3px 11px; border-radius: 6px; font-size: .82rem; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; padding: 18px; }
+  .spot { border: 1px solid var(--line); border-radius: 11px; overflow: hidden; display: flex; flex-direction: column; }
+  .spot img { width: 100%; height: 150px; object-fit: cover; background: #e6eaf0; display: block; }
+  .spot .body { padding: 13px; }
+  .spot .eyebrow { font-size: .74rem; font-weight: 700; color: var(--gold); letter-spacing: .04em; }
+  .spot h4 { font-size: 1rem; margin: 3px 0 5px; }
+  .spot p { font-size: .86rem; color: var(--ink-soft); line-height: 1.5; }
+  .spot .ops { margin-top: 8px; font-size: .8rem; font-weight: 700; color: var(--stop); }
 
-        .section-header { margin: 40px 0 20px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-        .section-num { background: var(--primary-blue); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
-        .section-title { font-size: 1.5rem; font-weight: 800; color: var(--primary-blue); }
+  /* ---------- changelog ---------- */
+  .changelog { background: #10141c; color: #e6eaf0; border-radius: 16px; padding: 30px 26px; margin-top: 46px; }
+  .changelog h2 { color: #93c5fd; font-size: 1.3rem; margin-bottom: 6px; }
+  .changelog > p { color: #a9b4c4; font-size: .9rem; margin-bottom: 18px; }
+  .changelog h4 { color: #fff; font-size: .98rem; margin: 18px 0 8px; }
+  .changelog ul { list-style: none; }
+  .changelog li { font-size: .89rem; color: #c8d1de; padding: 6px 0 6px 20px; position: relative; line-height: 1.55; }
+  .changelog li::before { content: "→"; position: absolute; left: 0; color: #60a5fa; }
+  .changelog code { background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 3px; font-size: .86em; }
+  .changelog strong { color: #fff; }
 
-        .plan-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 28px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
-        .plan-card.active-plan { border: 2px solid var(--active-glow); box-shadow: 0 0 20px rgba(59, 130, 246, 0.25); }
-        .plan-header { background: #f1f5f9; padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .plan-title { font-size: 1.25rem; font-weight: 700; color: var(--primary-blue); }
-        .plan-road-tag { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
-        .plan-target-tag { background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; }
-
-        .spots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; padding: 20px; }
-        .spot-item { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: #ffffff; display: flex; flex-direction: column; }
-        .spot-img { width: 100%; height: 160px; object-fit: cover; background-color: #e2e8f0; }
-        .spot-content { padding: 14px; flex: 1; display: flex; flex-direction: column; }
-        .spot-tag { font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 4px; }
-        .spot-title { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
-        .spot-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; }
-
-        .combo-section { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border-radius: 20px; padding: 36px 28px; margin-top: 50px; }
-        .combo-section h2 { font-size: 1.8rem; margin-bottom: 20px; text-align: center; color: #f8fafc; }
-        .combo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .combo-card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 20px; backdrop-filter: blur(8px); }
-        .combo-card h3 { color: #38bdf8; font-size: 1.15rem; margin-bottom: 10px; }
-        .combo-card p { font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; }
-
-        .hidden { display: none !important; }
-
-        footer { text-align: center; margin-top: 60px; color: var(--text-muted); font-size: 0.9rem; }
-    </style>
+  footer { text-align: center; margin-top: 40px; color: var(--ink-soft); font-size: .86rem; }
+  .hide { display: none !important; }
+  @media (max-width: 560px) { .planner { padding: 18px; } th, td { padding: 10px; } }
+</style>
 </head>
 <body>
 
-    <header class="hero">
-        <h1>富士山 360° 順時針尊榮自駕巡禮</h1>
-        <p>【06:30 河口湖日出出發 ➔ 14:45 前山中湖鑽石富士卡位】全線順時針無回頭路 × 彈性選配模組</p>
-        <div class="hero-badges">
-            <span class="badge badge-gold">💎 14:45 前準時抵達卡位</span>
-            <span class="badge">🌅 06:30 河口湖日出起點</span>
-            <span class="badge">⛺ 融入南部町《搖曳露營△》通學聖地</span>
+<header class="hero">
+  <h1>富士山 360° 逆時針自駕巡禮</h1>
+  <p class="sub">河口湖日出出發 → 本栖湖／身延 → 富士宮炒麵與淺間大社 → 山中湖平野之濱鑽石富士。<br>全線車程已改為實測值，抵達時間由頁面自行計算，不再是預估標語。</p>
+  <div class="chips">
+    <span class="chip hot">💎 鑽石富士 15:30・卡位目標 14:45</span>
+    <span class="chip">🌅 河口湖日出起點</span>
+    <span class="chip">🧭 導航以 Google Place ID 鎖定</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ PLANNER ============ -->
+  <section class="planner">
+    <h2>路線與時間表產生器</h2>
+    <p class="hint">四個變數都會影響能不能趕上卡位。改完按下按鈕，頁面會算出實際抵達時間，趕不上時會直接告訴你差幾分鐘、以及怎麼補回來。</p>
+
+    <div class="controls">
+      <div class="field">
+        <label for="selStart">河口湖出發時間</label>
+        <select id="selStart">
+          <option value="390">06:30（日出後立刻上路）</option>
+          <option value="405">06:45</option>
+          <option value="420" selected>07:00</option>
+          <option value="450">07:30</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="selA">前半段（河口湖 → 富士宮）</label>
+        <select id="selA">
+          <option value="A1">A1 本栖湖千圓札 ＋ 朝霧高原牧場</option>
+          <option value="A2" selected>A2 五湖水岸 ＋ 白絲雙瀑布</option>
+          <option value="A3">A3 搖曳露營聖地大連線（含南部町）</option>
+          <option value="A4">A4 身延山久遠寺纜車 ＋ 南部茶</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="selMid">富士宮停留（炒麵＋參拜）</label>
+        <select id="selMid">
+          <option value="45">45 分（只吃炒麵，快閃）</option>
+          <option value="60">60 分</option>
+          <option value="75" selected>75 分</option>
+          <option value="90">90 分（含湧玉池慢逛）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="selB">後半段（富士宮 → 山中湖）</label>
+        <select id="selB">
+          <option value="B0">B0 不加景點，直奔山中湖</option>
+          <option value="B1">B1 富士山夢之大橋</option>
+          <option value="B2" selected>B2 大淵笹場茶園</option>
+          <option value="B3">B3 水ヶ塚公園（寶永火口）</option>
+          <option value="B4">B4 御殿場 とらや工房</option>
+          <option value="B5">B5 御殿場 平和公園</option>
+          <option value="B6">B6 富士山世界遺產中心</option>
+        </select>
+      </div>
+    </div>
+    <button class="go-btn" id="calcBtn">算出時間表與導航路線</button>
+
+    <div id="result" class="result hide">
+      <div id="verdict" class="verdict"></div>
+      <a id="mapsLink" href="#" target="_blank" rel="noopener" class="maps-btn">在 Google Maps 開啟完整路線</a>
+      <p class="maps-note" id="mapsNote"></p>
+      <div class="t-wrap"><table>
+        <thead><tr>
+          <th style="width:22%">時間</th><th style="width:34%">地點</th><th>車程・停留・提醒</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 1 ============ -->
+  <div class="sec-head"><span>1</span><h2>前半段選配：河口湖 → 富士宮</h2></div>
+
+  <article class="plan" id="card-A1">
+    <div class="plan-top">
+      <h3>A1 本栖湖千圓札 ＋ 朝霧高原牧場</h3>
+      <span class="road">R139 → R300 → R139 南下</span>
+    </div>
+    <div class="grid">
+      <div class="spot">
+        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="本栖湖與富士山">
+        <div class="body">
+          <div class="eyebrow">晨間絕景</div>
+          <h4>中ノ倉峠 展望地</h4>
+          <p>千圓紙鈔背面那個角度就在這裡。停車場在隧道旁，從停車場到展望台要走 20–30 分鐘的上坡山徑，所以停留抓 85 分。</p>
+          <div class="ops">⚠ 需登山鞋・單程 20–30 分・雨後路滑</div>
         </div>
-    </header>
-
-    <main class="container">
-
-        <div class="timeline-bar">
-            <div class="timeline-step">
-                <div class="timeline-time">06:30 - 07:00</div>
-                <div class="timeline-desc">河口湖賞日出＆出發</div>
-            </div>
-            <div class="timeline-step">
-                <div class="timeline-time">07:00 - 11:30</div>
-                <div class="timeline-desc">前半段巡禮（4選1）</div>
-            </div>
-            <div class="timeline-step">
-                <div class="timeline-time">11:30 - 13:00</div>
-                <div class="timeline-desc">富士宮炒麵＆淺間大社</div>
-            </div>
-            <div class="timeline-step">
-                <div class="timeline-time">13:00 - 14:45</div>
-                <div class="timeline-desc">後半段巡禮（6選1）</div>
-            </div>
-            <div class="timeline-step">
-                <div class="timeline-time">14:45 - 16:30</div>
-                <div class="timeline-desc">山中湖鑽石富士絕景</div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShioMst8XJNf_T0IbEYy8APExpA6jK-vDoMenUPo0r0-gomhm4gSfyhuI&s=10" alt="まかいの牧場">
+        <div class="body">
+          <div class="eyebrow">朝霧高原</div>
+          <h4>まかいの牧場（馬飼野牧場）</h4>
+          <p>富士山大鞦韆、餵羊、濃厚牛奶冰淇淋。沿 R139 一路南下，順向不回頭。</p>
+          <div class="ops">⚠ 9:30 開園・需入園費</div>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <div class="route-generator-card">
-            <h3>🧭 智慧路線規劃與 Google Maps 導航生成器</h3>
-            <p class="generator-subtitle">選擇前半段與後半段方案，系統將整合各景點動態移動時間，自動生成 Google Map 完整路線及時間表。</p>
-            
-            <div class="select-group">
-                <div class="select-box">
-                    <label for="selectA">選擇前半段行程 (07:00 - 11:30):</label>
-                    <select id="selectA">
-                        <option value="A1">A1: 《搖曳露營△》動漫聖地原汁原味巡禮版</option>
-                        <option value="A2">A2: 水岸絕景與雙瀑布升級版</option>
-                        <option value="A3">A3: 《搖曳露營△》純血聖地大連線 (含南部町)</option>
-                        <option value="A4">A4: 身延山久遠寺纜車版 (含南部町茶點)</option>
-                    </select>
-                </div>
-                <div class="select-box">
-                    <label for="selectB">選擇後半段行程 (13:00 - 14:45):</label>
-                    <select id="selectB">
-                        <option value="B1">B1: 社群熱門「夢之大橋」網美線</option>
-                        <option value="B2">B2: 日式禪意「大淵笹場」茶園線</option>
-                        <option value="B3">B3: 高山壯麗「富士山 Skyline」火山線</option>
-                        <option value="B4">B4: 東麓竹林雅致線 (御殿場とらや工房)</option>
-                        <option value="B5">B5: 東麓景觀名勝線 (御殿場平和公園)</option>
-                        <option value="B6">B6: 現代建築美學線 (富士山世界遺產中心)</option>
-                    </select>
-                </div>
-                <button class="btn-calc" onclick="generateItineraryRoute()">
-                    <span>⚡ 產生專屬導航與時間表</span>
-                </button>
-            </div>
-
-            <div id="routeResult" class="route-result hidden">
-                <div class="result-actions">
-                    <a id="gmapsLink" href="#" target="_blank" class="btn-gmaps">
-                        🗺️ 開啟 Google Maps 完整多停靠點導航
-                    </a>
-                    <span id="bufferStatus" class="badge-status">⏱️ 預計到達時間計算中</span>
-                </div>
-                <div id="scheduleTableContainer" class="schedule-table-wrapper"></div>
-            </div>
+  <article class="plan" id="card-A2">
+    <div class="plan-top">
+      <h3>A2 五湖水岸 ＋ 白絲雙瀑布</h3>
+      <span class="road">R139 → 縣道 → R139</span>
+    </div>
+    <div class="grid">
+      <div class="spot">
+        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="精進湖">
+        <div class="body">
+          <div class="eyebrow">停靠 1</div>
+          <h4>精進湖展望台</h4>
+          <p>「子抱富士」的經典視角，路邊即停即拍。缺點是停車位只有兩格，錯過就得多繞一圈。</p>
         </div>
-
-        <div class="section-header">
-            <div class="section-num">1</div>
-            <h2 class="section-title">前半段行程選配【河口湖 ➔ 富士宮】(07:00 - 11:30)</h2>
+      </div>
+      <div class="spot">
+        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="本栖湖畔">
+        <div class="body">
+          <div class="eyebrow">停靠 2</div>
+          <h4>本栖湖 浩庵營地（湖畔）</h4>
+          <p>《搖曳露營△》第 1 集撫子與凜相遇的湖畔。這裡看不到千圓紙鈔的角度（那要爬中ノ倉峠），但水邊視野最開闊。</p>
+          <div class="ops">⚠ 非住宿者需付日歸入場費</div>
         </div>
-
-        <!-- A1 -->
-        <div class="plan-card" id="card-A1">
-            <div class="plan-header">
-                <div class="plan-title">方案 A1：《搖曳露營△》動漫聖地原汁原味巡禮版</div>
-                <div class="plan-road-tag">🛣️ 全線雙線道（經國道 300、52、139 號）</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="本棲湖展望公園">
-                    <div class="spot-content">
-                        <div class="spot-tag">景點 1｜晨間絕景</div>
-                        <h3 class="spot-title">本棲湖展望公園</h3>
-                        <p class="spot-desc">朝聖 1,000 日圓紙鈔背面的富士山倒影，《搖曳露營△》第 1 集撫子與凜相遇的神級聖地。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnWA9exzKbC9AZ7W6UVgKD41ImQXTdWNW5iDhC2HBhGuzXqTTbsPDA9jqzCiU9XlgzoA6HSlx63nKQGh1aKRhAL6XpExKwyNnBXndkl7OhXwpcTjoHrc2Q9o6mtiX-_ZKd6P4cmgg=s1360-w1360-h1020-rw" alt="身延榮昇堂">
-                    <div class="spot-content">
-                        <div class="spot-tag">景點 2｜美食巡禮</div>
-                        <h3 class="spot-title">身延 榮昇堂</h3>
-                        <p class="spot-desc">走國道 300 號山路，到達身延站前買熱騰騰身延饅頭，坐在富士川旁長椅享受聖地巡禮氛圍。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShioMst8XJNf_T0IbEYy8APExpA6jK-vDoMenUPo0r0-gomhm4gSfyhuI&s=10" alt="馬飼野牧場">
-                    <div class="spot-content">
-                        <div class="spot-tag">景點 3｜朝霧高原</div>
-                        <h3 class="spot-title">馬飼野牧場</h3>
-                        <p class="spot-desc">朝霧高原農場體驗！暢玩富士山高空大鞦韆、餵食羊咩咩，並品嚐極致濃郁的鮮奶冰淇淋 (J-An)。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://fujinomiya.gr.jp/wp-content/uploads/1970/01/shiraitonotaki00.jpg" alt="白絲瀑布">
+        <div class="body">
+          <div class="eyebrow">停靠 3・4</div>
+          <h4>田貫湖 → 白絲瀑布 ＆ 音止瀑布</h4>
+          <p>田貫湖畔的逆富士，接世界遺產白絲瀑布。兩瀑布之間有階梯步道，來回抓 45 分。</p>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <!-- A2 -->
-        <div class="plan-card" id="card-A2">
-            <div class="plan-header">
-                <div class="plan-title">方案 A2：水岸絕景與雙瀑布升級版（無時間限制）</div>
-                <div class="plan-road-tag">🛣️ 國道 139 號 ➔ 縣道 414 號</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="本棲湖倒影">
-                    <div class="spot-content">
-                        <div class="spot-tag">06:30 - 08:00</div>
-                        <h3 class="spot-title">精進湖 ＆ 本棲湖</h3>
-                        <p class="spot-desc">收集精進湖「抱子富士」與本棲湖「千圓富士」，無營業時間限制，清晨暢遊。</p>
-                    </div>
-                </div>
-                <div class="spot-item">
-                    <img class="spot-img" src="https://fujinomiya.gr.jp/wp-content/uploads/1970/01/shiraitonotaki00.jpg" alt="白絲瀑布實景">
-                    <div class="spot-content">
-                        <div class="spot-tag">08:00 - 10:45</div>
-                        <h3 class="spot-title">田貫湖 ＆ 白絲瀑布</h3>
-                        <p class="spot-desc">漫步田貫湖畔遠眺逆富士，再造訪富士山雪水湧出的世界遺產白絲瀑布與音止瀑布。</p>
-                    </div>
-                </div>
-            </div>
+  <article class="plan" id="card-A3">
+    <div class="plan-top">
+      <h3>A3 搖曳露營聖地大連線（含南部町）</h3>
+      <span class="road">R300 → R52 →（中部橫斷道）</span>
+    </div>
+    <div class="grid">
+      <div class="spot">
+        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="浩庵營地">
+        <div class="body">
+          <div class="eyebrow">聖地 1</div>
+          <h4>本栖湖 浩庵營地</h4>
+          <p>撫子與凜相遇的起點，營地商店有獨家周邊。</p>
+          <div class="ops">⚠ 需付日歸入場費</div>
         </div>
-
-        <!-- A3 -->
-        <div class="plan-card" id="card-A3">
-            <div class="plan-header">
-                <div class="plan-title">方案 A3：《搖曳露營△》純血聖地大連線 (含南部町)</div>
-                <div class="plan-road-tag">🛣️ 國道 300 號 ➔ 國道 52 號 (身延＆南部町聖地巡禮)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQb5JLil2Krc402T-BS5V_PLxj8P0r_wOA8m5gi_-H0k_PDa7b7tTd8UenEtBU43KZmOT9fYCCFSYUpWmI" alt="浩庵莊周邊">
-                    <div class="spot-content">
-                        <div class="spot-tag">聖地 1｜07:00 - 08:00</div>
-                        <h3 class="spot-title">本棲湖 浩庵莊周邊</h3>
-                        <p class="spot-desc">撫子與凜相遇的起點！卡位千圓紙鈔觀景點，選購浩庵莊獨家《搖曳露營△》限定周邊。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Former_Tokiwa_Junior_High_School.jpg/800px-Former_Tokiwa_Junior_High_School.jpg" alt="舊常葉小中學校">
-                    <div class="spot-content">
-                        <div class="spot-tag">聖地 2｜08:15 - 08:45</div>
-                        <h3 class="spot-title">舊常葉小中學校 (本栖高校)</h3>
-                        <p class="spot-desc">劇中野外活動同好會「本栖高校」的真實校舍原型，捕捉校門口與梯田校園經典視角。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnEapK0oygxnADjApNgUAzK6U1MaHoWKuJeF4eeW0_j3xfZ1yDbbtfnFKE1rqPfbA5pzSdOffN4Y78dTPZjWRvRiCLW2tedw_bNoPBXWujvZx9j8_E5vJryUyz-WOnV0slEEldr0w0sKwO5=s1360-w1360-h1020-rw" alt="SELVA 身延店">
-                    <div class="spot-content">
-                        <div class="spot-tag">聖地 3｜09:00 - 09:35</div>
-                        <h3 class="spot-title">SELVA 身延店 (劇中「ゼブラ」)</h3>
-                        <p class="spot-desc">犬山葵打工超市原型（09:00 開門），店內設有大型周邊專區、角色立牌與塗鴉留言本。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://i.imgur.com/isG4VA0.jpg" alt="身延榮昇堂">
-                    <div class="spot-content">
-                        <div class="spot-tag">聖地 4｜09:45 - 10:25</div>
-                        <h3 class="spot-title">身延站前 ＆ 榮昇堂</h3>
-                        <p class="spot-desc">購買熱騰騰現做身延饅頭，坐在富士川河畔長椅，重現野外活動同好會品嚐甜點的溫馨時刻。</p>
-                    </div>
-                </div>
-
-                <div class="spot-item">
-                    <img class="spot-img" src="https://i.imgur.com/LXumCyb.jpeg" alt="JR內船站與南部町">
-                    <div class="spot-content">
-                        <div class="spot-tag">聖地 5｜10:40 - 11:15</div>
-                        <h3 class="spot-title">南部町 JR內船站 ＆ 南部橋</h3>
-                        <p class="spot-desc">撫子每天通學搭車的車站原型與南部橋！順路停靠「道之驛 南部」採買限定南部茶特產。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Former_Tokiwa_Junior_High_School.jpg/800px-Former_Tokiwa_Junior_High_School.jpg" alt="廢校校舍">
+        <div class="body">
+          <div class="eyebrow">聖地 2</div>
+          <h4>舊下部小中學校（身延町常葉）</h4>
+          <p>「本栖高校」的校舍原型。導航請設常光院，粉絲的停車點在那裡，走過去約 2 分鐘。</p>
+          <div class="ops">⚠ 校地可走・校舍內部禁止進入・請勿喧嘩</div>
         </div>
-
-        <!-- A4 -->
-        <div class="plan-card" id="card-A4">
-            <div class="plan-header">
-                <div class="plan-title">方案 A4：身延山久遠寺纜車版 (含南部町茶點補給)</div>
-                <div class="plan-road-tag">🛣️ 國道 300 號 ➔ 縣道 804 號 ➔ 國道 52 號</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://www.minobusanropeway.co.jp/common/images/index/main_panel1_2.jpg" alt="身延山久遠寺纜車實景">
-                    <div class="spot-content">
-                        <div class="spot-tag">08:20 - 10:10</div>
-                        <h3 class="spot-title">身延山久遠寺纜車</h3>
-                        <p class="spot-desc">參拜千年古剎，搭乘 09:00 首班纜車登頂山頂展望台，俯瞰富士山與駿河灣壯景。</p>
-                    </div>
-                </div>
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnWA9exzKbC9AZ7W6UVgKD41ImQXTdWNW5iDhC2HBhGuzXqTTbsPDA9jqzCiU9XlgzoA6HSlx63nKQGh1aKRhAL6XpExKwyNnBXndkl7OhXwpcTjoHrc2Q9o6mtiX-_ZKd6P4cmgg=s1360-w1360-h1020-rw" alt="身延榮昇堂">
-                    <div class="spot-content">
-                        <div class="spot-tag">10:10 - 10:35</div>
-                        <h3 class="spot-title">身延 榮昇堂</h3>
-                        <p class="spot-desc">下山後順路品嚐名物身延饅頭，隨後沿國道 52 號南下往南部町。</p>
-                    </div>
-                </div>
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm6vutURuq1cfYTvt0V-2jazbCCn0BI8bRzf38Auso3cd6_AVx6W0P4_ut9MQUSfSE8ro3KN1xdqzAPaOt7JUVRyZViRbOF2rWrd-mRUwVqBUpT6iTzyXQMPQkiAWhyNcYw81rgsG7inRU=s1360-w1360-h1020-rw" alt="道之驛南部">
-                    <div class="spot-content">
-                        <div class="spot-tag">10:45 - 11:15</div>
-                        <h3 class="spot-title">道之驛 南部 (南部茶補給)</h3>
-                        <p class="spot-desc">國道 52 號旁熱門休息站，品嚐極致濃郁的「南部茶聖代」與採買在地名產伴手禮。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnEapK0oygxnADjApNgUAzK6U1MaHoWKuJeF4eeW0_j3xfZ1yDbbtfnFKE1rqPfbA5pzSdOffN4Y78dTPZjWRvRiCLW2tedw_bNoPBXWujvZx9j8_E5vJryUyz-WOnV0slEEldr0w0sKwO5=s1360-w1360-h1020-rw" alt="SELVA 身延店">
+        <div class="body">
+          <div class="eyebrow">聖地 3</div>
+          <h4>SELVA 身延店（劇中「ゼブラ」）</h4>
+          <p>犬山葵打工超市的原型，店內有周邊專區與留言本。</p>
+          <div class="ops">8:30 開門（原版寫 9:00 有誤）</div>
         </div>
-
-        <div class="section-header">
-            <div class="section-num">2</div>
-            <h2 class="section-title">中途站【富士宮 美食與參拜】(11:30 - 13:00)</h2>
+      </div>
+      <div class="spot">
+        <img src="https://i.imgur.com/isG4VA0.jpg" alt="栄昇堂">
+        <div class="body">
+          <div class="eyebrow">聖地 4</div>
+          <h4>身延站前 栄昇堂</h4>
+          <p>現做身延饅頭，帶去富士川畔長椅吃。</p>
+          <div class="ops">⚠ 8:30–15:00・週三定休</div>
         </div>
-
-        <div class="plan-card">
-            <div class="plan-header">
-                <div class="plan-title">富士宮市區固定停靠：千年大社與 B 級美食</div>
-                <div class="plan-road-tag">📍 市區景點步行可達，附設專屬停車場</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSouycY0qTCxvp3T3cjaI1YXGQpOppEnUyUphk75SBavIQBvYw1B2j3mvFCGHzIbUX-rFgjnsRF0bYOLbw" alt="淺間大社">
-                    <div class="spot-content">
-                        <div class="spot-tag">文化參拜</div>
-                        <h3 class="spot-title">富士山本宮淺間大社</h3>
-                        <p class="spot-desc">參拜全日本 1,300 多座淺間神社的總本社，漫步於富士山雪水湧出的清澈「湧玉池」。</p>
-                    </div>
-                </div>
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRVrw7BD5Bq0kVVf-WfskK209825PjdAc0zTK6obiqOOHGU0lTqvv1Deg5_bumi9ZL0fw8sdQsIvdUnyEE" alt="富士宮炒麵">
-                    <div class="spot-content">
-                        <div class="spot-tag">在地午餐</div>
-                        <h3 class="spot-title">宮橫丁 富士宮炒麵</h3>
-                        <p class="spot-desc">享用 B 級美食總冠軍「富士宮炒麵」，Q彈麵條搭配獨門醬汁與肉渣，香氣四溢。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://i.imgur.com/LXumCyb.jpeg" alt="內船站">
+        <div class="body">
+          <div class="eyebrow">聖地 5</div>
+          <h4>內船站 ＆ 南部橋</h4>
+          <p>撫子通學搭車的車站原型，走幾步就是南部橋。</p>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <div class="section-header">
-            <div class="section-num">3</div>
-            <h2 class="section-title">後半段行程選配【富士宮 ➔ 山中湖】(13:00 - 14:45)</h2>
+  <article class="plan" id="card-A4">
+    <div class="plan-top">
+      <h3>A4 身延山久遠寺纜車 ＋ 南部茶</h3>
+      <span class="road">R300 → R52 →（中部橫斷道）</span>
+    </div>
+    <div class="grid">
+      <div class="spot">
+        <img src="https://www.minobusanropeway.co.jp/common/images/index/main_panel1_2.jpg" alt="身延山纜車">
+        <div class="body">
+          <div class="eyebrow">主景點</div>
+          <h4>身延山纜車（久遠寺站）</h4>
+          <p>參拜久遠寺後搭纜車上奧之院，俯瞰富士山與駿河灣。含境內參拜與上下山，停留抓 110 分。</p>
+          <div class="ops">⚠ 首班 8:40（冬季 9:00）・20 分一班</div>
         </div>
-
-        <!-- B1 -->
-        <div class="plan-card" id="card-B1">
-            <div class="plan-header">
-                <div class="plan-title">方案 B1：社群熱門「夢之大橋」網美線</div>
-                <div class="plan-target-tag">🎯 預計 14:40 抵達山中湖 (緩衝 5 分)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWn30igj8_TpA9B4yJbj2CeiCeoXcKFBPJVr1k7u3gGq90s7JJOToyxrVHEyjOOpKx4QQOtqQauj0Q5rHc3fgjox6RmgOzGE9yFXSYWIULbeJN7dfVWEWDsrTmmK_dgJ04lugnDmkiHHrmk=s1360-w1360-h1020-rw" alt="富士山夢之大橋階梯實景">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:25 - 13:55 (停留 30 分)</div>
-                        <h3 class="spot-title">富士山夢之大橋</h3>
-                        <p class="spot-desc">階梯天橋富士山爆紅名所，站在天橋階梯上拍出延伸至富士山腳下的巨大視覺效果。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnWA9exzKbC9AZ7W6UVgKD41ImQXTdWNW5iDhC2HBhGuzXqTTbsPDA9jqzCiU9XlgzoA6HSlx63nKQGh1aKRhAL6XpExKwyNnBXndkl7OhXwpcTjoHrc2Q9o6mtiX-_ZKd6P4cmgg=s1360-w1360-h1020-rw" alt="栄昇堂">
+        <div class="body">
+          <div class="eyebrow">補給</div>
+          <h4>身延 栄昇堂</h4>
+          <p>下山順路，名物身延饅頭。</p>
+          <div class="ops">⚠ 8:30–15:00・週三定休</div>
         </div>
-
-        <!-- B2 -->
-        <div class="plan-card" id="card-B2">
-            <div class="plan-header">
-                <div class="plan-title">方案 B2：日式禪意「大淵笹場」茶園線（時間最寬裕）</div>
-                <div class="plan-target-tag">🎯 預計 14:35 抵達山中湖 (緩衝 10 分)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkq3uAFD7jWzS-NUnlos94_wKcTqLt2PxMqQvohrDy_nhWWXW0BeEMVFyyCQ0DD57ZmsLG6wpZFup29Y5-leC2-lEuSZ_DRbk4npprjU0L3iZr96dCoL3zo_DW1yb8_-KnRmfxBqw=s1360-w1360-h1020-rw" alt="大淵笹場無電線桿茶園實景">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:20 - 13:55 (停留 35 分)</div>
-                        <h3 class="spot-title">大淵笹場 茶園</h3>
-                        <p class="spot-desc">日本少數完全無電線桿干擾的傳統梯田茶園，享受愜意綠意與極具禪意的富士山風光。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm6vutURuq1cfYTvt0V-2jazbCCn0BI8bRzf38Auso3cd6_AVx6W0P4_ut9MQUSfSE8ro3KN1xdqzAPaOt7JUVRyZViRbOF2rWrd-mRUwVqBUpT6iTzyXQMPQkiAWhyNcYw81rgsG7inRU=s1360-w1360-h1020-rw" alt="道の駅なんぶ">
+        <div class="body">
+          <div class="eyebrow">休息站</div>
+          <h4>道之驛 なんぶ</h4>
+          <p>南部茶聖代與在地伴手禮，R52 旁最好停的一站。</p>
+          <div class="ops">9:00 開門</div>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <!-- B3 -->
-        <div class="plan-card" id="card-B3">
-            <div class="plan-header">
-                <div class="plan-title">方案 B3：高山壯麗「富士山 Skyline」火山線</div>
-                <div class="plan-target-tag">🎯 預計 14:45 壓線抵達 (須注意車流)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://images.keizai.biz/mtfuji_keizai/headline/1466488683_photo.jpg" alt="水ヶ塚公園">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:35 - 14:05 (停留 30 分)</div>
-                        <h3 class="spot-title">水ヶ塚公園 (寶永火口)</h3>
-                        <p class="spot-desc">經靜岡縣道 180 號，近距離仰望 1707 年寶永大噴發留下的巨大火山口，視角極具衝擊力。</p>
-                    </div>
-                </div>
-            </div>
+  <!-- ============ SECTION 2 ============ -->
+  <div class="sec-head"><span>2</span><h2>中途固定站：富士宮</h2></div>
+  <article class="plan">
+    <div class="plan-top">
+      <h3>富士山本宮淺間大社 ＋ お宮橫丁</h3>
+      <span class="road">兩處相鄰・步行 1 分・共用周邊收費停車場</span>
+    </div>
+    <div class="grid">
+      <div class="spot">
+        <img src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSouycY0qTCxvp3T3cjaI1YXGQpOppEnUyUphk75SBavIQBvYw1B2j3mvFCGHzIbUX-rFgjnsRF0bYOLbw" alt="淺間大社">
+        <div class="body">
+          <div class="eyebrow">參拜</div>
+          <h4>富士山本宮淺間大社</h4>
+          <p>全日本一千三百餘座淺間神社的總本社，境內湧玉池是富士山雪水湧出點。</p>
+          <div class="ops">8:30–16:30</div>
         </div>
-
-        <!-- B4 -->
-        <div class="plan-card" id="card-B4">
-            <div class="plan-header">
-                <div class="plan-title">方案 B4：東麓竹林雅致線（御殿場和菓子）</div>
-                <div class="plan-target-tag">🎯 預計 14:42 抵達山中湖 (緩衝 3 分)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcR2mR2630W11j41ywryrMQES117llBMWGFECrUhYtlD8UI_1pccI-BQrYQ7QeI3g_4J3H4QDUSoLy4Y5ZY" alt="とらや工房">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:45 - 14:15 (停留 30 分)</div>
-                        <h3 class="spot-title">御殿場 とらや工房</h3>
-                        <p class="spot-desc">位於幽靜竹林庭園內的傳統和菓子名店，漫步竹林步道並品嚐現做紅豆大福與煎茶。</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="spot">
+        <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRVrw7BD5Bq0kVVf-WfskK209825PjdAc0zTK6obiqOOHGU0lTqvv1Deg5_bumi9ZL0fw8sdQsIvdUnyEE" alt="富士宮炒麵">
+        <div class="body">
+          <div class="eyebrow">午餐</div>
+          <h4>お宮橫丁（富士宮炒麵）</h4>
+          <p>B 級美食總冠軍富士宮炒麵，橫丁內約十家攤位，另有富士山湧水飲水處。</p>
+          <div class="ops">⚠ 10:00 才開・選 A3/A4 時剛好趕上</div>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <!-- B5 -->
-        <div class="plan-card" id="card-B5">
-            <div class="plan-header">
-                <div class="plan-title">方案 B5：東麓景觀名勝線（遠眺御殿場全景）</div>
-                <div class="plan-target-tag">🎯 預計 14:40 抵達山中湖 (緩衝 5 分)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Heiwa_Koen_Gotemba.jpg/800px-Heiwa_Koen_Gotemba.jpg" alt="御殿場平和公園舍利白塔實景">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:40 - 14:10 (停留 30 分)</div>
-                        <h3 class="spot-title">御殿場平和公園</h3>
-                        <p class="spot-desc">走路線最平順的幹道，至公園舍利白塔高處遠眺御殿場市區與富士山全景，停靠彈性高。</p>
-                    </div>
-                </div>
-            </div>
+  <!-- ============ SECTION 3 ============ -->
+  <div class="sec-head"><span>3</span><h2>後半段選配：富士宮 → 山中湖</h2></div>
+
+  <article class="plan" id="card-B1">
+    <div class="plan-top"><h3>B1 富士山夢之大橋</h3><span class="road">回程約 85 分（走東名・御殿場）</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWn30igj8_TpA9B4yJbj2CeiCeoXcKFBPJVr1k7u3gGq90s7JJOToyxrVHEyjOOpKx4QQOtqQauj0Q5rHc3fgjox6RmgOzGE9yFXSYWIULbeJN7dfVWEWDsrTmmK_dgJ04lugnDmkiHHrmk=s1360-w1360-h1020-rw" alt="夢之大橋">
+      <div class="body"><div class="eyebrow">富士市蓼原</div><h4>富士山夢之大橋</h4>
+      <p>階梯天橋直指富士山的爆紅視角。橋下就是住宅區，現場有排隊管制並要求輕聲。</p>
+      <div class="ops">⚠ 位置最南，回山中湖車程最長</div></div>
+    </div></div>
+  </article>
+
+  <article class="plan" id="card-B2">
+    <div class="plan-top"><h3>B2 大淵笹場茶園</h3><span class="road">回程約 80 分</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkq3uAFD7jWzS-NUnlos94_wKcTqLt2PxMqQvohrDy_nhWWXW0BeEMVFyyCQ0DD57ZmsLG6wpZFup29Y5-leC2-lEuSZ_DRbk4npprjU0L3iZr96dCoL3zo_DW1yb8_-KnRmfxBqw=s1360-w1360-h1020-rw" alt="大淵笹場">
+      <div class="body"><div class="eyebrow">富士市大淵</div><h4>大淵笹場</h4>
+      <p>沒有電線桿干擾的梯田茶園配富士山，免費停車與免費茶水。上山道路狹窄，大車要小心。</p></div>
+    </div></div>
+  </article>
+
+  <article class="plan" id="card-B3">
+    <div class="plan-top"><h3>B3 水ヶ塚公園（寶永火口）</h3><span class="road">富士山 Skyline・回程約 55 分</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://images.keizai.biz/mtfuji_keizai/headline/1466488683_photo.jpg" alt="水ヶ塚公園">
+      <div class="body"><div class="eyebrow">裾野市</div><h4>水ヶ塚公園</h4>
+      <p>近距離仰望 1707 年寶永大噴發留下的火山口，冬天可以玩雪。</p>
+      <div class="ops">⚠ 園內設施平日休（週末 9–16）・冬季須查富士山 Skyline 通行止・夏季管制期停車收費</div></div>
+    </div></div>
+  </article>
+
+  <article class="plan" id="card-B4">
+    <div class="plan-top"><h3>B4 御殿場 とらや工房</h3><span class="road">回程僅約 35 分（篭坂峠）</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcR2mR2630W11j41ywryrMQES117llBMWGFECrUhYtlD8UI_1pccI-BQrYQ7QeI3g_4J3H4QDUSoLy4Y5ZY" alt="とらや工房">
+      <div class="body"><div class="eyebrow">御殿場東山</div><h4>とらや工房</h4>
+      <p>竹林庭園裡的和菓子名店，現做銅鑼燒與煎茶。位置最靠山中湖，回程壓力最小。</p>
+      <div class="ops">⚠ 10:00–18:00・週二定休</div></div>
+    </div></div>
+  </article>
+
+  <article class="plan" id="card-B5">
+    <div class="plan-top"><h3>B5 御殿場 平和公園</h3><span class="road">回程約 35 分</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Heiwa_Koen_Gotemba.jpg/800px-Heiwa_Koen_Gotemba.jpg" alt="平和公園">
+      <div class="body"><div class="eyebrow">御殿場東田中</div><h4>平和公園（舍利白塔）</h4>
+      <p>白塔高處遠眺御殿場市區與富士山，免費入園、有坡道可開上去。</p>
+      <div class="ops">9:00–17:00</div></div>
+    </div></div>
+  </article>
+
+  <article class="plan" id="card-B6">
+    <div class="plan-top"><h3>B6 富士山世界遺產中心</h3><span class="road">緊鄰淺間大社・回程約 90 分</span></div>
+    <div class="grid"><div class="spot">
+      <img src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRCuBXd-IP0hT0Bi7NHwOXQ7UBDJl4Ap0udd6LOFsN4al_UOav0S1lqg9DxTrkGM1MIMIzr5ATS68vXVQg" alt="世界遺產中心">
+      <div class="body"><div class="eyebrow">靜岡縣立・富士宮市宮町</div><h4>富士山世界遺產中心</h4>
+      <p>坂茂設計的倒立錐形木格柵，映在前池形成倒立富士。走完螺旋坡道約 40 分。</p>
+      <div class="ops">⚠ 9:00–18:00・無專屬停車場，須停周邊收費場</div></div>
+    </div></div>
+  </article>
+
+  <!-- ============ SECTION 4 ============ -->
+  <div class="sec-head"><span>4</span><h2>終點：山中湖 平野之濱</h2></div>
+  <article class="plan" style="border:2px solid var(--gold)">
+    <div class="plan-top" style="background:var(--gold-soft)">
+      <h3 style="color:var(--gold)">14:45 卡位 → 15:30 鑽石富士</h3>
+      <span class="road">替代點：長池親水公園／パノラマ台</span>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="spot">
+        <img style="height:250px" src="https://img.cooljapan-videos.com/files/articles/1aqdxsrg/thumbnail/e93428a87222e3723b5c8d420acc0069c68f43c1.jpg.webp" alt="鑽石富士">
+        <div class="body">
+          <div class="eyebrow">湖東岸・面向西南方富士山</div>
+          <h4>平野之濱（平野の浜）</h4>
+          <p>夕陽精準落入富士山頂的十分鐘。14:45 抵達是為了停車與卡位，不是為了看景——旺季這裡的路邊停車位會在 15:00 前後滿掉。</p>
+          <div class="ops">⚠ 鑽石富士的精確時刻每天都在變，出發前請對照當年度山中湖觀光課的日曆再確認一次</div>
         </div>
+      </div>
+    </div>
+  </article>
 
-        <!-- B6 -->
-        <div class="plan-card" id="card-B6">
-            <div class="plan-header">
-                <div class="plan-title">方案 B6：現代建築美學線（市區免拉車）</div>
-                <div class="plan-target-tag">🎯 預計 14:40 抵達山中湖 (緩衝 5 分)</div>
-            </div>
-            <div class="spots-grid">
-                <div class="spot-item">
-                    <img class="spot-img" src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRCuBXd-IP0hT0Bi7NHwOXQ7UBDJl4Ap0udd6LOFsN4al_UOav0S1lqg9DxTrkGM1MIMIzr5ATS68vXVQg" alt="世界遺產中心">
-                    <div class="spot-content">
-                        <div class="spot-tag">13:00 - 13:40 (停留 40 分)</div>
-                        <h3 class="spot-title">富士山世界遺產中心</h3>
-                        <p class="spot-desc">建築大師坂茂作品，倒立錐形木造建築映照於前方水池中，形成獨特的倒立富士山景觀。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ============ CHANGELOG ============ -->
+  <section class="changelog">
+    <h2>這一版改了什麼</h2>
+    <p>對照原始 V13，以下是實際動到的地方。</p>
 
-        <div class="section-header">
-            <div class="section-num">4</div>
-            <h2 class="section-title">終點站【山中湖 鑽石富士卡位】(14:45 - 16:30)</h2>
-        </div>
+    <h4>導航：8 處會導錯的設定</h4>
+    <ul>
+      <li>全部景點改用 <code>waypoint_place_ids</code> 鎖定 Google Place ID，不再靠英文字串模糊搜尋。</li>
+      <li><code>Eishondo</code> → 栄昇堂正確羅馬字是 <code>Eishodo</code>；<code>Utsunai Station</code> → 內船駅讀 <code>Utsubuna</code>；<code>Mizugazuka</code> → <code>Mizugatsuka</code>。</li>
+      <li><code>Motosuko Observation Deck</code> 在 Google 上不存在，改為實際登錄的「中ノ倉峠 展望地」。</li>
+      <li><code>Kouan Camping Ground</code> 會跟 2.5 公里外的「浩庵テント村」混淆，已改指定。</li>
+      <li>平野之濱、御殿場平和公園改用 Google 實際登錄名（平野の浜／平和公園）。</li>
+      <li>A2 原本只送了精進湖和白絲瀑布，本栖湖與田貫湖沒進導航，現在四點都在路線上。</li>
+    </ul>
 
-        <div class="plan-card" style="border: 2px solid var(--accent-gold);">
-            <div class="plan-header" style="background: #fef3c7;">
-                <div class="plan-title" style="color: #92400e;">核心重頭戲：14:45 卡位 ➔ 15:25 - 15:35 鑽石富士</div>
-                <div class="plan-target-tag">📍 平野之濱 / 長池親水公園 / パノラマ台</div>
-            </div>
-            <div class="spots-grid" style="grid-template-columns: 1fr;">
-                <div class="spot-item">
-                    <img class="spot-img" style="height: 260px;" src="https://img.cooljapan-videos.com/files/articles/1aqdxsrg/thumbnail/e93428a87222e3723b5c8d420acc0069c68f43c1.jpg.webp" alt="鑽石富士">
-                    <div class="spot-content">
-                        <div class="spot-tag">14:45 準時抵達 ➔ 15:25 - 15:35 鑽石富士光芒</div>
-                        <h3 class="spot-title">山中湖 平野之濱（鑽石富士）</h3>
-                        <p class="spot-desc">核心重頭戲！14:45 前抵達湖畔停妥車輛並完成卡位，親眼目睹夕陽精準落入富士山頂、發出如鑽石般耀眼光芒的奇蹟絕景。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h4>景點名稱：3 處事實錯誤</h4>
+    <ul>
+      <li><strong>「本棲湖展望公園」不存在</strong>。千圓紙鈔的角度在中ノ倉峠展望地，而且要爬 20–30 分鐘，停留從 30 分改為 85 分。</li>
+      <li><strong>「舊常葉小中學校」名稱有誤</strong>。常葉是地名，校舍是舊下部小中學校，導航點改為停車用的常光院。（部分資料也稱舊常葉中學校，現場請以常光院為準。）</li>
+      <li><strong>千圓紙鈔景點被誤植在浩庵</strong>。浩庵是撫子與凜相遇的湖畔營地，看不到紙鈔那個角度，兩處描述已分開。</li>
+    </ul>
 
-        <div class="combo-section">
-            <h2>💡 最佳組合建議 Recommendation Combo</h2>
-            <div class="combo-grid">
+    <h4>車程：原版普遍低估 20–40 分</h4>
+    <ul>
+      <li><strong>富士宮 → 山中湖從 55–60 分改為 80–90 分。</strong>這是原版最關鍵的低估，走東名經御殿場約 90 分，走 R139 經河口湖更久。</li>
+      <li>A1 原本排「本栖湖 → 身延 → 朝霧高原」，但身延到朝霧必須沿 R300 翻回本栖湖，是 70 分鐘的回頭路，與「全線無回頭路」矛盾。身延已移出 A1，保留在 A3／A4。</li>
+      <li>馬飼野牧場 → 淺間大社 15 分改 35 分；河口湖 → 身延山 50 分改 70 分；南部町 → 富士宮改為走中部橫斷道 45 分（需過路費）。</li>
+    </ul>
 
-                <div class="combo-card">
-                    <h3>🏆 聖地巡禮玩家首選【A3 + B1】</h3>
-                    <p>露營 5 大純血聖地大連線（本棲湖＋高校＋超市＋身延饅頭＋南部町）＋ 富士宮炒麵/神社 ＋ 夢之大橋 ＋ 鑽石富士！</p>
-                </div>
+    <h4>邏輯與一致性</h4>
+    <ul>
+      <li><strong>方向寫反了</strong>：河口湖（北）→ 本栖湖（西北）→ 身延（西）→ 富士宮（南）→ 御殿場（東南）→ 山中湖（東北），這是逆時針，標題已更正。</li>
+      <li>原版卡片上的時間是手寫死的，跟產生器算出來的表對不上（例如 B1 卡片寫 14:40，實算 14:50）。現在所有時間一律由設定檔即時計算，不會再有兩套數字。</li>
+      <li>原版「首選組合 A3+B1」用它自己的產生器算是 15:05 抵達，會跳紅字警告。現在 A3／A4 這類長行程會直接顯示要縮短富士宮停留或提早出發，並算出還差幾分鐘。</li>
+      <li>新增「B0 不加景點直奔山中湖」——A3／A4 配任何後半段都趕不上，這是它們唯一穩的走法。</li>
+      <li>新增出發時間與富士宮停留兩個控制項，因為這兩個是唯一能真正把時間追回來的變數。</li>
+      <li>移除沒被使用的 <code>MIDPOINT.driveMinFromPrev</code>。</li>
+    </ul>
 
-                <div class="combo-card">
-                    <h3>🍵 雅致禪意首選【A2 + B2】</h3>
-                    <p>雙湖雙瀑布 ＋ 富士宮神社 ＋ 大淵笹場茶園 ＋ 鑽石富士。車程最穩定且時間最寬裕，氣氛優雅惬意。</p>
-                </div>
+    <h4>營業時間（原版沒檢查）</h4>
+    <ul>
+      <li>栄昇堂 8:30–15:00 <strong>週三休</strong>；とらや工房 10:00–18:00 <strong>週二休</strong>——這兩個定休日會整段行程作廢。</li>
+      <li>SELVA 身延 8:30 開（原版寫 9:00）、まかいの牧場 9:30 開園、お宮橫丁 10:00 開、道之驛なんぶ 9:00 開。</li>
+      <li>身延山纜車首班 8:40（冬季 9:00）。A4 原本 7:50 就到，要乾等 50 分以上，車程已改為 70 分緩解。</li>
+      <li>世界遺產中心無專屬停車場；水ヶ塚公園設施平日休，冬季須查通行止。</li>
+      <li>抵達時間早於開門時間時，時間表會直接在該列標紅。</li>
+    </ul>
+  </section>
 
-                <div class="combo-card">
-                    <h3>🌋 壯麗火山首選【A1 + B3】</h3>
-                    <p>原汁原味漫遊 ＋ 富士宮神社 ＋ 寶永火口 ＋ 鑽石富士。近距離感受富士山火山地貌與宏偉景色。</p>
-                </div>
+  <footer>富士山 360° 逆時針自駕巡禮｜導航修正版 V14<br>
+  車程為一般路況估值，含收費道路。出發前請以當日 Google Maps 實際路況與各設施官網為準。</footer>
+</main>
 
-            </div>
-        </div>
+<script>
+"use strict";
 
-        <footer>
-            <p>富士山 360° 順時針尊榮自駕巡禮 | 路線導航整合版 V13</p>
-        </footer>
+/* ============================================================
+   行程設定檔
+   drive = 從上一個點開車過來的分鐘數
+   stay  = 建議停留分鐘數
+   open  = 最早可入場時間（分鐘，用來判斷是否太早到）
+   closed= 定休日提醒文字
+   ============================================================ */
+const CFG = {
+  TARGET_ARRIVAL: 14 * 60 + 45,   // 卡位目標 14:45
+  DIAMOND_TIME:   15 * 60 + 30,   // 鑽石富士 15:30
 
-    </main>
+  ORIGIN: { name: "河口湖駅", navName: "河口湖駅", placeId: "ChIJMSQyt4JgGWARGxEj8inq2wc" },
 
-    <script>
-    /**
-     * 行程地點與移動停留時間配置檔
-     */
-    const ITINERARY_CONFIG = {
-        START_TIME: "07:00",
-        ORIGIN: { name: "河口湖車站", queryName: "Kawaguchiko Station" },
-        MIDPOINT: { 
-            name: "富士山本宮淺間大社 (宮橫丁炒麵)", 
-            queryName: "Fujisan Hongu Sengen Taisha", 
-            driveMinFromPrev: 15,
-            stayMin: 90 
-        },
-        DESTINATION: { 
-            name: "山中湖 平野之濱", 
-            queryName: "Yamanakako Hirano Beach",
-            targetArrival: "14:45"
-        },
-        
-        // 前半段選配選項 A1 - A4
-        A_PLANS: {
-            A1: {
-                title: "方案 A1: 《搖曳露營△》動漫聖地原汁原味巡禮版",
-                spots: [
-                    { name: "本棲湖展望公園", queryName: "Motosuko Observation Deck", driveMin: 32, stayMin: 30 },
-                    { name: "身延 榮昇堂", queryName: "Eishondo Minobu", driveMin: 35, stayMin: 25 },
-                    { name: "馬飼野牧場", queryName: "Makaino Farm", driveMin: 45, stayMin: 65 }
-                ],
-                toMidpointDriveMin: 15
-            },
-            A2: {
-                title: "方案 A2: 水岸絕景與雙瀑布升級版",
-                spots: [
-                    { name: "精進湖 ＆ 本棲湖", queryName: "Lake Shoji", driveMin: 30, stayMin: 60 },
-                    { name: "田貫湖 ＆ 白絲瀑布", queryName: "Shiraito Falls Fujinomiya", driveMin: 35, stayMin: 105 }
-                ],
-                toMidpointDriveMin: 20
-            },
-            A3: {
-                title: "方案 A3: 《搖曳露營△》純血聖地大連線 (含南部町)",
-                spots: [
-                    { name: "本棲湖 浩庵莊", queryName: "Kouan Camping Ground", driveMin: 30, stayMin: 30 },
-                    { name: "舊常葉小中學校 (本栖高校)", queryName: "Former Tokiwa Junior High School", driveMin: 15, stayMin: 30 },
-                    { name: "SELVA 身延店", queryName: "Selva Minobu", driveMin: 15, stayMin: 35 },
-                    { name: "身延站前 榮昇堂", queryName: "Eishondo Minobu", driveMin: 10, stayMin: 40 },
-                    { name: "JR內船站 ＆ 南部橋", queryName: "Utsunai Station", driveMin: 15, stayMin: 35 }
-                ],
-                toMidpointDriveMin: 30
-            },
-            A4: {
-                title: "方案 A4: 身延山久遠寺纜車版 (含南部町茶點)",
-                spots: [
-                    { name: "身延山久遠寺纜車", queryName: "Minobusan Ropeway", driveMin: 50, stayMin: 110 },
-                    { name: "身延 榮昇堂", queryName: "Eishondo Minobu", driveMin: 10, stayMin: 25 },
-                    { name: "道之驛 南部 (南部茶)", queryName: "Michi-no-Eki Nanbu", driveMin: 15, stayMin: 30 }
-                ],
-                toMidpointDriveMin: 30
-            }
-        },
-        
-        // 後半段選配選項 B1 - B6
-        B_PLANS: {
-            B1: {
-                title: "方案 B1: 社群熱門「夢之大橋」網美線",
-                spots: [
-                    { name: "富士山夢之大橋", queryName: "Fujisan Yume no Ohashi", driveMin: 25, stayMin: 30 }
-                ],
-                toDestDriveMin: 55
-            },
-            B2: {
-                title: "方案 B2: 日式禪意「大淵笹場」茶園線",
-                spots: [
-                    { name: "大淵笹場 茶園", queryName: "Obuchi Sasaba", driveMin: 20, stayMin: 35 }
-                ],
-                toDestDriveMin: 55
-            },
-            B3: {
-                title: "方案 B3: 高山壯麗「富士山 Skyline」火山線",
-                spots: [
-                    { name: "水ヶ塚公園 (寶永火口)", queryName: "Mizugazuka Park", driveMin: 35, stayMin: 30 }
-                ],
-                toDestDriveMin: 40
-            },
-            B4: {
-                title: "方案 B4: 東麓竹林雅致線 (御殿場とらや工房)",
-                spots: [
-                    { name: "御殿場 とらや工房", queryName: "Toraya Kobo", driveMin: 45, stayMin: 30 }
-                ],
-                toDestDriveMin: 30
-            },
-            B5: {
-                title: "方案 B5: 東麓景觀名勝線 (御殿場平和公園)",
-                spots: [
-                    { name: "御殿場平和公園", queryName: "Gotemba Heiwa Park", driveMin: 40, stayMin: 30 }
-                ],
-                toDestDriveMin: 30
-            },
-            B6: {
-                title: "方案 B6: 現代建築美學線 (富士山世界遺產中心)",
-                spots: [
-                    { name: "富士山世界遺產中心", queryName: "Mt. Fuji World Heritage Centre Shizuoka", driveMin: 5, stayMin: 40 }
-                ],
-                toDestDriveMin: 60
-            }
-        }
-    };
+  MID: {
+    name: "富士山本宮淺間大社 ＋ お宮橫丁",
+    navName: "富士山本宮浅間大社",
+    placeId: "ChIJE_h8kefUG2ARt84QZaZLCNg",
+    open: 10 * 60,
+    memo: "淺間大社 8:30 開門，お宮橫丁（炒麵）10:00 才開"
+  },
 
-    function addMinutesToTime(timeStr, minutesToAdd) {
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        const date = new Date(2026, 0, 1, hours, minutes + minutesToAdd);
-        const h = String(date.getHours()).padStart(2, '0');
-        const m = String(date.getMinutes()).padStart(2, '0');
-        return `${h}:${m}`;
+  DEST: {
+    name: "山中湖 平野之濱",
+    navName: "山中湖 平野の浜",
+    placeId: "ChIJNxzQjuxvGWARSiMK1UFfoa4"
+  },
+
+  A: {
+    A1: { toMid: 35, spots: [
+      { name: "中ノ倉峠 展望地", navName: "中ノ倉峠 展望地", placeId: "ChIJ7a4flhbmG2ARI9Prrx2sjLE", drive: 35, stay: 85,
+        memo: "停車場在隧道旁，往展望台單程步行 20–30 分" },
+      { name: "まかいの牧場", navName: "まかいの牧場", placeId: "ChIJyfHirW7bG2ARtXbzuYZRGpg", drive: 40, stay: 65,
+        open: 9 * 60 + 30, memo: "需入園費" }
+    ]},
+    A2: { toMid: 22, spots: [
+      { name: "精進湖展望台", navName: "精進湖展望台", placeId: "ChIJHeOt4N7nG2ARerfeBmqpnx0", drive: 22, stay: 25,
+        memo: "路邊停車僅約 2 格" },
+      { name: "本栖湖 浩庵營地", navName: "浩庵キャンプ場", placeId: "ChIJuea39RXmG2AR4z4fk_95fXc", drive: 10, stay: 25,
+        memo: "非住宿者需付日歸入場費" },
+      { name: "田貫湖", navName: "田貫湖", placeId: "ChIJB4Fd897dG2ARQGU_RWxUWA4", drive: 35, stay: 30 },
+      { name: "白絲瀑布 ＆ 音止瀑布", navName: "白糸の滝", placeId: "ChIJTa6BAO7aG2ARo2W6w446Kgk", drive: 12, stay: 45,
+        memo: "停車場收費，往返兩瀑布有階梯" }
+    ]},
+    A3: { toMid: 45, midMemo: "走中部橫斷道（需過路費）", spots: [
+      { name: "本栖湖 浩庵營地", navName: "浩庵キャンプ場", placeId: "ChIJuea39RXmG2AR4z4fk_95fXc", drive: 35, stay: 40,
+        memo: "需付日歸入場費" },
+      { name: "舊下部小中學校（停常光院）", navName: "常光院", placeId: "ChIJN8w8sVXpG2ARwiLPUszt78Q", drive: 25, stay: 30,
+        memo: "校舍內部禁止進入，請保持安靜" },
+      { name: "SELVA 身延店", navName: "セルバ身延店", placeId: "ChIJzShsqYHrG2ARgXO5tTXLQNM", drive: 15, stay: 30,
+        open: 8 * 60 + 30 },
+      { name: "身延站前 栄昇堂", navName: "栄昇堂", placeId: "ChIJMXNpv9vBG2ARrzNVJgVkRR8", drive: 18, stay: 30,
+        open: 8 * 60 + 30, closed: "週三定休（15:00 打烊）" },
+      { name: "內船駅 ＆ 南部橋", navName: "内船駅", placeId: "ChIJbW1Zjb3GG2ARizHtdAccop4", drive: 18, stay: 25 }
+    ]},
+    A4: { toMid: 45, midMemo: "走中部橫斷道（需過路費）", spots: [
+      { name: "身延山纜車 久遠寺站", navName: "身延山ロープウェイ 久遠寺駅", placeId: "ChIJU4A-9iLrG2ARjlR4x0Gm408", drive: 70, stay: 110,
+        open: 8 * 60 + 40, memo: "首班 8:40（冬季 9:00），20 分一班" },
+      { name: "身延 栄昇堂", navName: "栄昇堂", placeId: "ChIJMXNpv9vBG2ARrzNVJgVkRR8", drive: 15, stay: 25,
+        open: 8 * 60 + 30, closed: "週三定休" },
+      { name: "道之驛 なんぶ", navName: "道の駅なんぶ", placeId: "ChIJPVgux2LBG2ARvYOSJctlzN4", drive: 15, stay: 30,
+        open: 9 * 60 }
+    ]}
+  },
+
+  B: {
+    B0: { toDest: 90, destMemo: "走東名經御殿場，過篭坂峠進山中湖", spots: [] },
+    B1: { toDest: 85, spots: [
+      { name: "富士山夢之大橋", navName: "富士山夢の大橋", placeId: "ChIJfZPnEQArGmARLopF0Yas1CM", drive: 25, stay: 30,
+        memo: "住宅區內，現場有排隊管制" } ]},
+    B2: { toDest: 80, spots: [
+      { name: "大淵笹場", navName: "大淵笹場", placeId: "ChIJadkMX6LVG2ARQxgJU6Dq-6U", drive: 25, stay: 35,
+        memo: "上山道路狹窄，停車場不大" } ]},
+    B3: { toDest: 55, spots: [
+      { name: "水ヶ塚公園", navName: "水ヶ塚公園", placeId: "ChIJVdYcwUV8GWARouaFhTMTojU", drive: 40, stay: 30,
+        memo: "園內設施平日休；冬季須查富士山 Skyline 通行止" } ]},
+    B4: { toDest: 35, spots: [
+      { name: "とらや工房", navName: "とらや工房", placeId: "ChIJObYJEAh2GWARg3zTQLKBIrA", drive: 55, stay: 30,
+        open: 10 * 60, closed: "週二定休" } ]},
+    B5: { toDest: 35, spots: [
+      { name: "御殿場 平和公園", navName: "平和公園 御殿場", placeId: "ChIJTY8hYQN2GWAROiaPE1eMwak", drive: 55, stay: 30,
+        open: 9 * 60 } ]},
+    B6: { toDest: 90, spots: [
+      { name: "富士山世界遺產中心", navName: "静岡県富士山世界遺産センター", placeId: "ChIJg3cRUwHRG2AR2PSLlojYNl8", drive: 5, stay: 40,
+        open: 9 * 60, memo: "無專屬停車場，須停周邊收費場" } ]}
+  }
+};
+
+const hhmm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+
+/* 走一次行程，回傳每一列與最終抵達時間 */
+function runPlan(startMin, aKey, midStay, bKey) {
+  const A = CFG.A[aKey], B = CFG.B[bKey];
+  const rows = [];
+  let t = startMin;
+
+  rows.push({ time: hhmm(t), name: "起點：" + CFG.ORIGIN.name, kind: "start",
+              detail: "完成河口湖日出賞景，啟程" });
+
+  const walk = (spot) => {
+    let arrive = t + spot.drive;
+    let flag = "";
+    if (spot.open && arrive < spot.open) {
+      flag = "抵達時尚未開門（" + hhmm(spot.open) + " 開），會空等 " + (spot.open - arrive) + " 分";
     }
+    const depart = Math.max(arrive, spot.open || 0) + spot.stay;
+    rows.push({
+      time: hhmm(arrive) + " – " + hhmm(depart),
+      name: spot.name, kind: "spot", drive: spot.drive, stay: spot.stay,
+      memo: [spot.memo, spot.closed].filter(Boolean).join("・"), flag
+    });
+    t = depart;
+  };
 
-    function calculateTimeDifferenceMin(timeStr1, timeStr2) {
-        const [h1, m1] = timeStr1.split(':').map(Number);
-        const [h2, m2] = timeStr2.split(':').map(Number);
-        return (h2 * 60 + m2) - (h1 * 60 + m1);
+  A.spots.forEach(walk);
+
+  // 中途站：富士宮
+  const midArrive = t + A.toMid;
+  let midFlag = "";
+  if (midArrive < CFG.MID.open) {
+    midFlag = "お宮橫丁 10:00 才開，會空等 " + (CFG.MID.open - midArrive) + " 分";
+  }
+  const midDepart = midArrive + midStay;
+  rows.push({
+    time: hhmm(midArrive) + " – " + hhmm(midDepart),
+    name: "中途站：" + CFG.MID.name, kind: "mid",
+    drive: A.toMid, stay: midStay,
+    memo: [CFG.MID.memo, A.midMemo].filter(Boolean).join("・"), flag: midFlag
+  });
+  t = midDepart;
+
+  B.spots.forEach(walk);
+
+  const finalArrive = t + B.toDest;
+  rows.push({
+    time: hhmm(finalArrive) + " 抵達",
+    name: "終點：" + CFG.DEST.name, kind: "end",
+    drive: B.toDest,
+    memo: (B.destMemo ? B.destMemo + "・" : "") +
+          "卡位等待 " + hhmm(CFG.DIAMOND_TIME) + " 鑽石富士"
+  });
+
+  return { rows, finalArrive };
+}
+
+/* 找出在其他條件不變下，還能撐住的最長富士宮停留 */
+function maxMidStay(startMin, aKey, bKey) {
+  for (let s = 90; s >= 45; s -= 15) {
+    if (runPlan(startMin, aKey, s, bKey).finalArrive <= CFG.TARGET_ARRIVAL) return s;
+  }
+  return -1;
+}
+
+/* 若砍掉前半段最後一站就能達標，回傳那一站的名字 */
+function dropLastSpot(startMin, aKey, midStay, bKey) {
+  const spots = CFG.A[aKey].spots;
+  if (spots.length < 2) return null;
+  const last = spots[spots.length - 1];
+  const trimmed = { ...CFG.A[aKey], spots: spots.slice(0, -1) };
+  const saved = CFG.A[aKey];
+  CFG.A[aKey] = trimmed;
+  const arrive = runPlan(startMin, aKey, midStay, bKey).finalArrive;
+  CFG.A[aKey] = saved;
+  return (CFG.TARGET_ARRIVAL - arrive >= 15) ? last.name : null;
+}
+
+function buildMapsUrl(aKey, bKey) {
+  const pts = [...CFG.A[aKey].spots, CFG.MID, ...CFG.B[bKey].spots];
+  const q = s => encodeURIComponent(s);
+  const label = p => p.navName || p.name;
+  return "https://www.google.com/maps/dir/?api=1"
+    + "&origin=" + q(label(CFG.ORIGIN)) + "&origin_place_id=" + q(CFG.ORIGIN.placeId)
+    + "&destination=" + q(label(CFG.DEST)) + "&destination_place_id=" + q(CFG.DEST.placeId)
+    + "&waypoints=" + pts.map(p => q(label(p))).join("|")
+    + "&waypoint_place_ids=" + pts.map(p => q(p.placeId)).join("|")
+    + "&travelmode=driving";
+}
+
+function render() {
+  const startMin = +document.getElementById("selStart").value;
+  const aKey = document.getElementById("selA").value;
+  const bKey = document.getElementById("selB").value;
+  const midStay = +document.getElementById("selMid").value;
+
+  const { rows, finalArrive } = runPlan(startMin, aKey, midStay, bKey);
+  const slack = CFG.TARGET_ARRIVAL - finalArrive;
+
+  // 高亮選中的卡片
+  document.querySelectorAll(".plan").forEach(p => p.classList.remove("on"));
+  [aKey, bKey].forEach(k => {
+    const el = document.getElementById("card-" + k);
+    if (el) el.classList.add("on");
+  });
+
+  // 判定
+  const v = document.getElementById("verdict");
+  let cls, head, body = "", fix = "";
+
+  if (slack >= 15) {
+    cls = "v-go";
+    head = "趕得上：預計 " + hhmm(finalArrive) + " 抵達平野之濱，比卡位目標早 " + slack + " 分鐘";
+    body = "有餘裕停車、找位置、架腳架。";
+  } else if (slack >= 0) {
+    cls = "v-warn";
+    head = "壓線：預計 " + hhmm(finalArrive) + " 抵達，只剩 " + slack + " 分鐘餘裕";
+    body = "旺季週末的篭坂峠與湖畔停車位很容易塞掉這點餘裕，建議提早出發或砍掉一站。";
+  } else {
+    cls = "v-stop";
+    head = "趕不上：預計 " + hhmm(finalArrive) + " 抵達，比卡位目標晚 " + (-slack) + " 分鐘";
+    body = "仍在鑽石富士（" + hhmm(CFG.DIAMOND_TIME) + "）之前 "
+         + (CFG.DIAMOND_TIME - finalArrive) + " 分鐘抵達，但沒有卡位緩衝。";
+    if (finalArrive >= CFG.DIAMOND_TIME) {
+      body = "會錯過 " + hhmm(CFG.DIAMOND_TIME) + " 的鑽石富士，這個組合不可行。";
     }
+  }
 
-    function buildGoogleMapsUrl(waypoints) {
-        const baseUrl = "https://www.google.com/maps/dir/?api=1";
-        const origin = encodeURIComponent(ITINERARY_CONFIG.ORIGIN.queryName);
-        const destination = encodeURIComponent(ITINERARY_CONFIG.DESTINATION.queryName);
-        
-        const formattedWaypoints = waypoints
-            .map(spot => encodeURIComponent(spot.queryName))
-            .join('|');
-
-        return `${baseUrl}&origin=${origin}&destination=${destination}&waypoints=${formattedWaypoints}&travelmode=driving`;
+  // 補救建議
+  if (slack < 15) {
+    const best = maxMidStay(startMin, aKey, bKey);
+    const options = [];
+    if (best >= 0 && best < midStay) {
+      options.push("富士宮停留縮到 " + best + " 分");
     }
-
-    function generateItineraryRoute() {
-        const planAKey = document.getElementById('selectA').value;
-        const planBKey = document.getElementById('selectB').value;
-
-        const planAData = ITINERARY_CONFIG.A_PLANS[planAKey];
-        const planBData = ITINERARY_CONFIG.B_PLANS[planBKey];
-
-        // 高亮顯示選中的 Plan Card
-        document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active-plan'));
-        const cardA = document.getElementById(`card-${planAKey}`);
-        const cardB = document.getElementById(`card-${planBKey}`);
-        if (cardA) cardA.classList.add('active-plan');
-        if (cardB) cardB.classList.add('active-plan');
-
-        // 建立完整 Google Maps 途經點
-        const allWaypoints = [
-            ...planAData.spots,
-            ITINERARY_CONFIG.MIDPOINT,
-            ...planBData.spots
-        ];
-        
-        // 產生 Google Maps 連結
-        const mapsUrl = buildGoogleMapsUrl(allWaypoints);
-        const gmapsLinkElem = document.getElementById('gmapsLink');
-        gmapsLinkElem.href = mapsUrl;
-
-        // 開始依序計算時間表
-        let currentTime = ITINERARY_CONFIG.START_TIME;
-        const scheduleRows = [];
-
-        // 1. 起點出發
-        scheduleRows.push({
-            timeRange: currentTime,
-            spotName: `🚩 起點：${ITINERARY_CONFIG.ORIGIN.name}`,
-            type: "start",
-            note: "完成河口湖日出賞景，啟程前往前半段景點"
-        });
-
-        // 2. 前半段選配 (A)
-        planAData.spots.forEach((spot) => {
-            const arrivalTime = addMinutesToTime(currentTime, spot.driveMin);
-            const departureTime = addMinutesToTime(arrivalTime, spot.stayMin);
-            scheduleRows.push({
-                timeRange: `${arrivalTime} - ${departureTime}`,
-                spotName: spot.name,
-                type: "spot",
-                note: `<span class="tag-drive">開車 ~${spot.driveMin}分</span> <span class="tag-stay">停留 ${spot.stayMin}分</span>`
-            });
-            currentTime = departureTime;
-        });
-
-        // 3. 中途站：富士宮 (午餐與參拜)
-        const midArrival = addMinutesToTime(currentTime, planAData.toMidpointDriveMin);
-        const midDeparture = addMinutesToTime(midArrival, ITINERARY_CONFIG.MIDPOINT.stayMin);
-        scheduleRows.push({
-            timeRange: `${midArrival} - ${midDeparture}`,
-            spotName: `🍱 中途站：${ITINERARY_CONFIG.MIDPOINT.name}`,
-            type: "midpoint",
-            note: `<span class="tag-drive">開車 ~${planAData.toMidpointDriveMin}分</span> <span class="tag-stay">享用富士宮炒麵 & 淺間大社參拜 ${ITINERARY_CONFIG.MIDPOINT.stayMin}分</span>`
-        });
-        currentTime = midDeparture;
-
-        // 4. 後半段選配 (B)
-        planBData.spots.forEach((spot) => {
-            const arrivalTime = addMinutesToTime(currentTime, spot.driveMin);
-            const departureTime = addMinutesToTime(arrivalTime, spot.stayMin);
-            scheduleRows.push({
-                timeRange: `${arrivalTime} - ${departureTime}`,
-                spotName: spot.name,
-                type: "spot",
-                note: `<span class="tag-drive">開車 ~${spot.driveMin}分</span> <span class="tag-stay">停留 ${spot.stayMin}分</span>`
-            });
-            currentTime = departureTime;
-        });
-
-        // 5. 終點站：山中湖 平野之濱
-        const finalArrival = addMinutesToTime(currentTime, planBData.toDestDriveMin);
-        scheduleRows.push({
-            timeRange: `${finalArrival} 抵達`,
-            spotName: `💎 終點：${ITINERARY_CONFIG.DESTINATION.name}`,
-            type: "destination",
-            note: `<span class="tag-drive">開車 ~${planBData.toDestDriveMin}分</span> 卡位等待 15:25 - 15:35 鑽石富士絕景`
-        });
-
-        // 計算緩衝時間與狀態
-        const bufferMin = calculateTimeDifferenceMin(finalArrival, ITINERARY_CONFIG.DESTINATION.targetArrival);
-        const bufferStatusElem = document.getElementById('bufferStatus');
-        
-        if (bufferMin >= 0) {
-            bufferStatusElem.style.background = "#dcfce7";
-            bufferStatusElem.style.color = "#166534";
-            bufferStatusElem.innerHTML = `✅ 預計 ${finalArrival} 抵達山中湖 (充裕緩衝 ${bufferMin} 分鐘)`;
-        } else {
-            bufferStatusElem.style.background = "#fee2e2";
-            bufferStatusElem.style.color = "#991b1b";
-            bufferStatusElem.innerHTML = `⚠️ 預計 ${finalArrival} 抵達山中湖 (建議提早 5-10 分出發)`;
-        }
-
-        // 渲染 HTML 表格
-        renderScheduleTable(scheduleRows);
-
-        // 顯示結果區塊並平滑滾動
-        const resultElem = document.getElementById('routeResult');
-        resultElem.classList.remove('hidden');
+    if (startMin > 390) {
+      const earlier = runPlan(390, aKey, midStay, bKey).finalArrive;
+      if (CFG.TARGET_ARRIVAL - earlier >= 15) options.push("出發時間提早到 06:30");
     }
-
-    function renderScheduleTable(rows) {
-        let tableHtml = `
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">預估時間</th>
-                        <th style="width: 35%;">景點 / 停靠站</th>
-                        <th style="width: 40%;">車程與停留細節</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        rows.forEach(row => {
-            let rowStyle = "";
-            if (row.type === "start") rowStyle = "background-color: #f8fafc;";
-            if (row.type === "midpoint") rowStyle = "background-color: #eff6ff; font-weight: 600;";
-            if (row.type === "destination") rowStyle = "background-color: #fef3c7; font-weight: 700;";
-
-            tableHtml += `
-                <tr style="${rowStyle}">
-                    <td><strong>${row.timeRange}</strong></td>
-                    <td>${row.spotName}</td>
-                    <td>${row.note}</td>
-                </tr>
-            `;
-        });
-
-        tableHtml += `
-                </tbody>
-            </table>
-        `;
-
-        document.getElementById('scheduleTableContainer').innerHTML = tableHtml;
+    if (bKey !== "B0") {
+      const direct = runPlan(startMin, aKey, midStay, "B0").finalArrive;
+      if (CFG.TARGET_ARRIVAL - direct >= 15) options.push("後半段改成 B0 直奔山中湖");
     }
+    const drop = dropLastSpot(startMin, aKey, midStay, bKey);
+    if (drop) options.push("前半段砍掉最後一站「" + drop + "」");
+    fix = options.length
+      ? "怎麼補回來：" + options.join("，或 ")
+      : "這個前半段的長度本身就吃掉了全部時間，建議換成 A1 或 A2。";
+  }
 
-    // 頁面載入時預設自動計算一次初始組合 (A1 + B1)
-    window.onload = function() {
-        generateItineraryRoute();
-    };
-    </script>
+  v.className = "verdict " + cls;
+  v.innerHTML = "<h3>" + head + "</h3><p>" + body + "</p>"
+              + (fix ? '<p class="fix">' + fix + "</p>" : "");
+
+  // 導航連結
+  document.getElementById("mapsLink").href = buildMapsUrl(aKey, bKey);
+  const stops = CFG.A[aKey].spots.length + 1 + CFG.B[bKey].spots.length + 2;
+  document.getElementById("mapsNote").textContent =
+    "共 " + stops + " 個停靠點，以 Place ID 鎖定，不會被同名地點導錯。"
+    + (stops > 9 ? "（已接近 Google Maps 單一路線 10 站上限）" : "");
+
+  // 時間表
+  const clsMap = { start: "r-start", mid: "r-mid", end: "r-end" };
+  document.getElementById("tbody").innerHTML = rows.map(r => {
+    const bits = [];
+    if (r.drive) bits.push('<span class="pill p-drive">開車 ' + r.drive + " 分</span>");
+    if (r.stay)  bits.push('<span class="pill p-stay">停留 ' + r.stay + " 分</span>");
+    let cell = bits.join(" ") + (r.detail ? r.detail : "");
+    if (r.memo) cell += '<span class="memo">' + r.memo + "</span>";
+    if (r.flag) cell += '<span class="flag">⚠ ' + r.flag + "</span>";
+    return '<tr class="' + (clsMap[r.kind] || "") + '"><td class="time">' + r.time
+         + "</td><td>" + r.name + "</td><td>" + cell + "</td></tr>";
+  }).join("");
+
+  document.getElementById("result").classList.remove("hide");
+}
+
+document.getElementById("calcBtn").addEventListener("click", render);
+["selStart", "selA", "selMid", "selB"].forEach(id =>
+  document.getElementById(id).addEventListener("change", render));
+render();
+</script>
 </body>
 </html>
